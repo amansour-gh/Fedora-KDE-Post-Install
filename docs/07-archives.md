@@ -1,63 +1,42 @@
 # Archives and Compression
 
-Fedora provides the tools needed to work with common archive and compression formats.
+Fedora provides a wide range of tools for working with compressed files and archives.
 
-On a KDE Plasma workstation, most users can handle archives through **Ark** and **Dolphin**, while terminal users can use standard command-line tools such as `tar`, `gzip`, `xz`, `zstd`, and `7z`.
+For a Fedora KDE Plasma workstation, the recommended approach is to use **Ark** for graphical archive management and **7-Zip** when command-line access or broader format support is needed.
 
-The goal of this chapter is to explain:
+This chapter covers:
 
-* The difference between archiving and compression.
-* Common archive formats.
-* How to work with archives from the terminal.
-* How to use Ark with KDE Plasma.
-* When `7zip` is useful.
-* How to handle RAR archives.
-* How to inspect archives before extracting them.
-* Safe extraction practices.
-* Which packages are actually necessary.
+* Archive and compression concepts.
+* Archive tools available in Fedora.
+* Recommended packages for Fedora KDE.
+* Installation and verification.
+* Graphical archive management with Ark and Dolphin.
+* Terminal usage with `tar`, `7z`, and other tools.
+* ZIP, TAR, 7z, RAR, and common compression formats.
+* Safe archive extraction.
+* Troubleshooting.
 
-> **Important:** Do not install every archive utility available. Fedora already provides many of the required tools, and Ark can use the available backend tools to handle many formats.
+> **Important:** Do not install every archive utility available. Start with the recommended tools and install additional packages only when you actually need them.
 
 ---
 
 ## 1. Archive vs Compression
 
-An **archive** is a file containing one or more files and directories.
+An **archive** combines one or more files and directories into a single file.
 
-Compression reduces the size of data.
+**Compression** reduces the amount of space required to store data.
 
-These are related but different operations.
+These are different operations, although they are often used together.
 
 For example:
 
 ```text
-tar
-```
-
-primarily creates an archive containing multiple files.
-
-Compression tools such as:
-
-```text
-gzip
-bzip2
-xz
-zstd
-```
-
-compress data.
-
-This is why you commonly see filenames such as:
-
-```text
 backup.tar
-backup.tar.gz
-backup.tar.bz2
-backup.tar.xz
-backup.tar.zst
 ```
 
-A file such as:
+is an archive created with `tar`.
+
+While:
 
 ```text
 backup.tar.xz
@@ -65,347 +44,193 @@ backup.tar.xz
 
 means:
 
-1. `tar` combined multiple files into an archive.
-2. `xz` compressed the resulting archive.
+1. `tar` created the archive.
+2. `xz` compressed it.
 
-Modern archive tools such as `7z` can combine archiving and compression in a single format.
-
----
-
-## 2. Common Archive Formats
-
-Some common formats encountered on Linux systems include:
-
-| Format             | Typical use                       |
-| ------------------ | --------------------------------- |
-| `.tar`             | Archive without compression       |
-| `.tar.gz` / `.tgz` | TAR + gzip                        |
-| `.tar.bz2`         | TAR + bzip2                       |
-| `.tar.xz`          | TAR + xz                          |
-| `.tar.zst`         | TAR + zstd                        |
-| `.zip`             | General-purpose archive           |
-| `.7z`              | High-compression archive          |
-| `.rar`             | Common proprietary archive format |
-
-The correct tool depends on the format.
-
----
-
-## 3. Check Installed Tools
-
-Before installing anything, check what is already available.
-
-For example:
-
-```bash
-command -v tar
-```
-
-```bash
-command -v gzip
-```
-
-```bash
-command -v xz
-```
-
-```bash
-command -v zstd
-```
-
-```bash
-command -v 7z
-```
-
-You can also check the versions:
-
-```bash
-tar --version
-```
-
-```bash
-7z
-```
-
-If a command is missing, search Fedora before installing it:
-
-```bash
-dnf search package-name
-```
-
----
-
-## 4. TAR Archives
-
-`tar` is one of the most important archive tools on Linux.
-
-### Create a TAR archive
-
-To archive a directory:
-
-```bash
-tar -cf archive.tar my-folder/
-```
-
-Options:
+This is why Linux archives commonly have names such as:
 
 ```text
--c    create
--f    specify the output file
-```
-
-### List the contents
-
-```bash
-tar -tf archive.tar
-```
-
-### Extract an archive
-
-```bash
-tar -xf archive.tar
-```
-
-### Extract to a specific directory
-
-```bash
-tar -xf archive.tar -C destination/
-```
-
-The destination directory must already exist.
-
-For example:
-
-```bash
-mkdir extracted
-tar -xf archive.tar -C extracted/
+.tar
+.tar.gz
+.tar.bz2
+.tar.xz
+.tar.zst
 ```
 
 ---
 
-## 5. TAR + Gzip
+## 2. Archive Tools Available in Fedora
 
-Gzip is commonly used together with TAR.
+Fedora provides packages for many common archive formats.
 
-### Create a compressed archive
+| Package / Tool  | Purpose                                   | Recommended                          |
+| --------------- | ----------------------------------------- | ------------------------------------ |
+| `ark`           | KDE graphical archive manager             | **Yes**                              |
+| `7zip`          | 7-Zip command-line archive tool           | **Yes**                              |
+| `tar`           | Traditional Linux archive tool            | **Yes / normally already available** |
+| `gzip`          | gzip compression                          | **Use when required**                |
+| `bzip2`         | bzip2 compression                         | **Use when required**                |
+| `xz`            | xz compression                            | **Use when required**                |
+| `zstd`          | Zstandard compression                     | **Use when required**                |
+| `zip` / `unzip` | ZIP archives                              | **Use when required**                |
+| `unrar-free`    | Free RAR extraction support               | **Optional**                         |
+| `unar`          | Additional archive/RAR extraction support | **Optional**                         |
 
-```bash
-tar -czf archive.tar.gz my-folder/
-```
-
-The `z` option tells `tar` to use gzip compression.
-
-### List contents
-
-```bash
-tar -tzf archive.tar.gz
-```
-
-### Extract
-
-```bash
-tar -xzf archive.tar.gz
-```
+Fedora's `7zip` package supports creating and extracting formats including 7z, XZ, BZIP2, GZIP, TAR, ZIP, and WIM, with additional formats available for extraction.
 
 ---
 
-## 6. TAR + Bzip2
+## 3. Recommended Fedora KDE Setup
 
-Bzip2 is another compression format.
+For a normal Fedora KDE workstation, the recommended baseline is:
 
-### Create
+### Ark
 
-```bash
-tar -cjf archive.tar.bz2 my-folder/
-```
+**Ark** is the natural graphical archive manager for KDE Plasma.
 
-### List
+It integrates with the KDE desktop and can open, create, extract, and manage many archive formats. Fedora 44 currently provides Ark 26.08.1.
 
-```bash
-tar -tjf archive.tar.bz2
-```
-
-### Extract
+Install it with:
 
 ```bash
-tar -xjf archive.tar.bz2
+sudo dnf install ark
 ```
 
-Bzip2 is still encountered in older Linux software and source archives, but it does not need to be installed separately just because the format exists.
+### 7-Zip
 
----
+**7-Zip** is recommended as the main additional command-line archive utility.
 
-## 7. TAR + XZ
+Fedora 44 currently provides `7zip` 26.02-1.fc44. The package provides the `7z` command and also provides compatibility with the `p7zip-plugins` interface.
 
-XZ provides strong compression and is commonly used for source code and Linux-related archives.
-
-### Create
-
-```bash
-tar -cJf archive.tar.xz my-folder/
-```
-
-### List
-
-```bash
-tar -tJf archive.tar.xz
-```
-
-### Extract
-
-```bash
-tar -xJf archive.tar.xz
-```
-
----
-
-## 8. TAR + Zstandard
-
-Zstandard (`zstd`) is a modern compression format designed for high performance.
-
-A `.tar.zst` archive can be created with:
-
-```bash
-tar --zstd -cf archive.tar.zst my-folder/
-```
-
-List its contents:
-
-```bash
-tar --zstd -tf archive.tar.zst
-```
-
-Extract it:
-
-```bash
-tar --zstd -xf archive.tar.zst
-```
-
-Zstandard is particularly useful when speed is important.
-
----
-
-## 9. ZIP Archives
-
-ZIP is one of the most widely used archive formats, especially when exchanging files with Windows users.
-
-### Create a ZIP archive
-
-If `zip` is installed:
-
-```bash
-zip -r archive.zip my-folder/
-```
-
-### List contents
-
-```bash
-unzip -l archive.zip
-```
-
-### Extract
-
-```bash
-unzip archive.zip
-```
-
-### Extract to a directory
-
-```bash
-unzip archive.zip -d extracted/
-```
-
-If the `zip` or `unzip` commands are not available, search Fedora first:
-
-```bash
-dnf search zip
-```
-
-Do not install multiple ZIP implementations unnecessarily.
-
----
-
-## 10. 7-Zip
-
-7-Zip provides a modern archive format with strong compression.
-
-Fedora 44 provides the `7zip` package. The package includes the `7z` command and supports creating and extracting several common formats.
-
-Install it if you need 7z archives:
+Install it with:
 
 ```bash
 sudo dnf install 7zip
 ```
 
-Check the command:
+### Recommended baseline
+
+If you want the standard archive setup for a Fedora KDE workstation:
+
+```bash
+sudo dnf install ark 7zip
+```
+
+This gives you:
+
+```text
+Dolphin
+   ↓
+Ark
+   ↓
+Graphical archive management
+
+and
+
+Terminal
+   ↓
+7z
+   ↓
+Command-line archive management
+```
+
+---
+
+## 4. Optional RAR Support
+
+RAR archives are still common when exchanging files with other systems.
+
+Fedora provides `unrar-free`, a free implementation that can list and extract RAR archives. Fedora 44 currently provides version `0.3.3-2.fc44`.
+
+Install it only if you actually need RAR support:
+
+```bash
+sudo dnf install unrar-free
+```
+
+Fedora also provides an `unrar` wrapper package for the same free implementation.
+
+For additional archive extraction capabilities, Fedora also provides `unar`.
+
+Do not install several RAR tools simply because they are available.
+
+Start with:
+
+```bash
+sudo dnf install unrar-free
+```
+
+and add another tool only if a particular archive requires it.
+
+---
+
+## 5. Check What Is Already Installed
+
+Before installing anything, check the current system.
+
+For Ark:
+
+```bash
+rpm -q ark
+```
+
+For 7-Zip:
+
+```bash
+rpm -q 7zip
+```
+
+For the `7z` command:
+
+```bash
+command -v 7z
+```
+
+For TAR:
+
+```bash
+command -v tar
+```
+
+For RAR support:
+
+```bash
+rpm -q unrar-free
+```
+
+If a package is already installed, there is no reason to install it again.
+
+---
+
+## 6. Install the Recommended Tools
+
+For the normal Fedora KDE setup:
+
+```bash
+sudo dnf install ark 7zip
+```
+
+Verify:
+
+```bash
+rpm -q ark 7zip
+```
+
+Then verify the 7-Zip command:
 
 ```bash
 7z
 ```
 
-### Create a 7z archive
+You should see the 7-Zip command-line help.
+
+Check TAR:
 
 ```bash
-7z a archive.7z my-folder/
+tar --version
 ```
 
-### List contents
-
-```bash
-7z l archive.7z
-```
-
-### Extract
-
-```bash
-7z x archive.7z
-```
-
-### Extract to a specific directory
-
-```bash
-7z x archive.7z -oextracted/
-```
-
-The `-o` option specifies the output directory.
-
-> **Note:** The current Fedora `7zip` package also supports packing and unpacking formats such as TAR, GZIP, BZIP2, XZ, ZIP, and WIM, in addition to its native 7z format.
-
----
-
-## 11. Password-Protected Archives
-
-7-Zip supports encrypted archives.
-
-For example:
-
-```bash
-7z a -p archive.7z my-folder/
-```
-
-The command asks for the password interactively.
-
-To encrypt filenames as well:
-
-```bash
-7z a -p -mhe=on archive.7z my-folder/
-```
-
-> **Security note:** Password-protected archives are useful for protecting data, but they are not a substitute for a proper backup strategy.
-
-Avoid putting passwords directly into shell history when possible.
-
----
-
-## 12. RAR Archives
-
-RAR is commonly encountered when exchanging files with Windows users.
-
-RAR support on Linux depends on the available extraction backend.
-
-Fedora provides `unrar-free`, a free implementation capable of listing and extracting RAR archives. Fedora 44 currently provides version `0.3.3-2.fc44`.
-
-Install it only if you need RAR extraction:
+If you need RAR files:
 
 ```bash
 sudo dnf install unrar-free
@@ -414,64 +239,52 @@ sudo dnf install unrar-free
 Then:
 
 ```bash
-unrar-free l archive.rar
+rpm -q unrar-free
 ```
-
-To extract:
-
-```bash
-unrar-free x archive.rar
-```
-
-Fedora also provides an `unrar` wrapper package for the free implementation.
-
-Another option is `unar`, which supports RARv5 and can handle encrypted and multi-volume RAR archives. Fedora 44 provides it as well.
-
-For a normal workstation, do not install several RAR tools unless you actually need their different capabilities.
 
 ---
 
-## 13. Ark and KDE Plasma
+## 7. Why We Do Not Install Every Compression Package
 
-For KDE Plasma users, **Ark** is the main graphical archive manager.
+It may be tempting to install:
 
-You can install it with:
-
-```bash
-sudo dnf install ark
+```text
+gzip
+bzip2
+xz
+zstd
+zip
+unzip
+7zip
+unrar
+unar
 ```
 
-Ark integrates with KDE applications and supports many archive formats through its available backends.
+all at once.
 
-Fedora 44's current Ark package depends on `7zip` and provides MIME handling for formats including:
+This is usually unnecessary.
 
-* 7z
-* ZIP
-* RAR
-* TAR
-* GZIP
-* BZIP2
-* XZ
-* Zstandard
+Fedora already uses many of these tools as part of the normal system environment, and applications can depend on them when required.
 
-among many others.
+The recommended approach is:
 
-### Open an archive
+```text
+Install the KDE archive manager
+        ↓
+Install 7-Zip
+        ↓
+Use existing system tools
+        ↓
+Add optional tools only when needed
+```
 
-From Dolphin:
-
-1. Locate the archive.
-2. Double-click it.
-3. Ark should open the archive.
-4. Inspect or extract the files.
-
-You can also right-click an archive in Dolphin and use the available extraction actions.
+This keeps the workstation simpler and avoids unnecessary packages.
 
 ---
 
-## 14. Extracting Archives with Dolphin
+# 8. Using Ark with Dolphin
 
-For normal desktop use, Dolphin + Ark is usually easier than using the terminal.
+For normal desktop usage, **Dolphin + Ark** is the easiest approach.
 
 Typical workflow:
 
@@ -487,19 +300,326 @@ Inspect contents
 Extract
 ```
 
-For a simple archive, you usually do not need to open a terminal.
+For example, when you double-click:
 
-Use the terminal when:
+```text
+backup.tar.xz
+```
 
-* You are working with many archives.
-* You need repeatable commands.
-* You are working on a remote system.
-* You need more control over extraction.
-* You are following a software build or installation procedure.
+Dolphin can open it with Ark.
+
+From Ark you can:
+
+* Browse the archive.
+* Extract files.
+* Extract the complete archive.
+* Create new archives.
+* Add files.
+* Remove files.
+* Work with supported encrypted archives.
+
+For most desktop users, this is all that is required.
 
 ---
 
-## 15. Inspect an Archive Before Extracting
+## 9. Creating an Archive with Ark
+
+In Ark, you can create a new archive through the graphical interface.
+
+The exact menu layout may vary slightly between KDE Plasma releases.
+
+The general workflow is:
+
+```text
+Ark
+ ↓
+New Archive
+ ↓
+Choose archive name and format
+ ↓
+Add files/directories
+ ↓
+Save
+```
+
+For normal desktop usage, Ark avoids the need to remember command-line options.
+
+---
+
+# 10. TAR Archives
+
+`tar` is one of the most important archive tools on Linux.
+
+### Create a TAR archive
+
+```bash
+tar -cf archive.tar my-folder/
+```
+
+Where:
+
+```text
+-c    create
+-f    specify the output file
+```
+
+### List contents
+
+```bash
+tar -tf archive.tar
+```
+
+### Extract
+
+```bash
+tar -xf archive.tar
+```
+
+### Extract to a specific directory
+
+Create the destination first:
+
+```bash
+mkdir extracted
+```
+
+Then:
+
+```bash
+tar -xf archive.tar -C extracted/
+```
+
+---
+
+# 11. TAR + Gzip
+
+A common Linux archive is:
+
+```text
+.tar.gz
+```
+
+Create one:
+
+```bash
+tar -czf archive.tar.gz my-folder/
+```
+
+List its contents:
+
+```bash
+tar -tzf archive.tar.gz
+```
+
+Extract it:
+
+```bash
+tar -xzf archive.tar.gz
+```
+
+The `z` option tells `tar` to use gzip.
+
+---
+
+# 12. TAR + Bzip2
+
+For `.tar.bz2` archives:
+
+Create:
+
+```bash
+tar -cjf archive.tar.bz2 my-folder/
+```
+
+List:
+
+```bash
+tar -tjf archive.tar.bz2
+```
+
+Extract:
+
+```bash
+tar -xjf archive.tar.bz2
+```
+
+Bzip2 is less common on modern systems than some newer compression formats, but it is still encountered in older software and source archives.
+
+---
+
+# 13. TAR + XZ
+
+For `.tar.xz` archives:
+
+Create:
+
+```bash
+tar -cJf archive.tar.xz my-folder/
+```
+
+List:
+
+```bash
+tar -tJf archive.tar.xz
+```
+
+Extract:
+
+```bash
+tar -xJf archive.tar.xz
+```
+
+XZ is frequently encountered in Linux source archives and software distributions.
+
+---
+
+# 14. TAR + Zstandard
+
+Zstandard is a modern compression format designed for good compression and high speed.
+
+For `.tar.zst`:
+
+Create:
+
+```bash
+tar --zstd -cf archive.tar.zst my-folder/
+```
+
+List:
+
+```bash
+tar --zstd -tf archive.tar.zst
+```
+
+Extract:
+
+```bash
+tar --zstd -xf archive.tar.zst
+```
+
+---
+
+# 15. ZIP Archives
+
+ZIP is one of the most common formats when exchanging files with Windows users.
+
+If the `zip` command is available:
+
+Create:
+
+```bash
+zip -r archive.zip my-folder/
+```
+
+List:
+
+```bash
+unzip -l archive.zip
+```
+
+Extract:
+
+```bash
+unzip archive.zip
+```
+
+Extract to a specific directory:
+
+```bash
+mkdir extracted
+unzip archive.zip -d extracted/
+```
+
+If the commands are missing, search Fedora before installing packages:
+
+```bash
+dnf search zip
+```
+
+---
+
+# 16. 7-Zip Archives
+
+The native 7-Zip format is:
+
+```text
+.7z
+```
+
+Create an archive:
+
+```bash
+7z a archive.7z my-folder/
+```
+
+List its contents:
+
+```bash
+7z l archive.7z
+```
+
+Extract:
+
+```bash
+7z x archive.7z
+```
+
+Extract to a specific directory:
+
+```bash
+mkdir extracted
+7z x archive.7z -oextracted/
+```
+
+The `7z` command can also work with many other archive formats. Fedora's current `7zip` package supports packing/unpacking 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM, and can unpack a wider range of formats.
+
+---
+
+# 17. Password-Protected 7z Archives
+
+7-Zip can create encrypted archives.
+
+For example:
+
+```bash
+7z a -p archive.7z my-folder/
+```
+
+It will ask for the password.
+
+To encrypt the filenames as well:
+
+```bash
+7z a -p -mhe=on archive.7z my-folder/
+```
+
+Avoid putting passwords directly into commands when possible because shell history may record them.
+
+Password-protected archives are useful for protecting individual archives, but they are not a replacement for backups.
+
+---
+
+# 18. RAR Archives
+
+If you receive a RAR archive and installed `unrar-free`, you can inspect it with:
+
+```bash
+unrar-free l archive.rar
+```
+
+Extract it with:
+
+```bash
+unrar-free x archive.rar
+```
+
+If a particular RAR archive cannot be handled correctly, check whether another Fedora-supported extraction tool such as `unar` is more appropriate.
+
+The important point is that **RAR support is optional**. There is no need to install RAR utilities on every Fedora KDE system.
+
+---
+
+# 19. Inspect an Archive Before Extracting
 
 It is often useful to inspect an archive before extracting it.
 
@@ -521,75 +641,84 @@ For 7z:
 7z l archive.7z
 ```
 
-This allows you to see what the archive contains before writing files to your current directory.
+For RAR:
 
-For downloaded archives, this is a good habit.
+```bash
+unrar-free l archive.rar
+```
+
+This allows you to see:
+
+* What files are included.
+* The directory structure.
+* Whether unexpected files are present.
+* Approximately how much data will be extracted.
+
+This is especially useful for archives downloaded from the Internet.
 
 ---
 
-## 16. Safe Extraction
+# 20. Safe Extraction
 
-Do not automatically extract an archive into an important directory.
+Avoid extracting an unknown archive directly into an important directory.
 
-For example, instead of:
-
-```bash
-tar -xf downloaded-file.tar.xz
-```
-
-inside a directory containing important files, create a dedicated extraction directory:
+Instead, create a dedicated directory:
 
 ```bash
 mkdir extracted
-tar -xf downloaded-file.tar.xz -C extracted/
 ```
 
-This keeps the extracted files isolated.
+Then extract into it.
+
+For TAR:
+
+```bash
+tar -xf archive.tar -C extracted/
+```
 
 For ZIP:
 
 ```bash
-mkdir extracted
 unzip archive.zip -d extracted/
 ```
 
 For 7z:
 
 ```bash
-mkdir extracted
 7z x archive.7z -oextracted/
 ```
 
+This makes it easier to inspect and remove the extracted contents if necessary.
+
 ---
 
-## 17. Be Careful with Archives from the Internet
+# 21. Archives from the Internet
 
 An archive can contain:
 
-* Executable files
-* Scripts
-* Symbolic links
-* Unexpected directory structures
-* Files with misleading names
+* Executable files.
+* Shell scripts.
+* Symbolic links.
+* Configuration files.
+* Unexpected directory structures.
+* Files designed to trick the user into executing them.
 
-An archive itself does not automatically make its contents trustworthy.
+Before using an archive from an unknown source:
 
-Before using files from an unknown source:
+1. Verify the source.
+2. Check the checksum if the publisher provides one.
+3. Inspect the archive contents.
+4. Extract it into a suitable directory.
+5. Do not execute scripts simply because they were included in the archive.
+6. Read installation instructions before running commands.
 
-1. Verify where the archive came from.
-2. Check its checksum when the publisher provides one.
-3. Inspect its contents.
-4. Extract it into a dedicated directory.
-5. Do not execute scripts simply because they were included in an archive.
-6. Be especially careful with archives that contain installation scripts.
-
-> **Important:** Extracting a file is not the same as executing it, but extracted scripts and binaries can still be dangerous if you run them.
+> **Important:** Extracting an archive does not automatically execute its contents. The risk comes when you subsequently open, execute, or install untrusted files.
 
 ---
 
-## 18. Identifying an Archive
+# 22. Identify an Unknown File
 
-If you receive a file with an unclear extension, use:
+If a downloaded file has an unclear extension, use:
 
 ```bash
 file filename
@@ -601,13 +730,13 @@ For example:
 file downloaded-file
 ```
 
-The `file` command examines the file contents and attempts to identify its format.
+The `file` command examines the file contents and attempts to identify its actual format.
 
-This is more reliable than simply trusting the filename extension.
+This is more useful than relying only on the filename extension.
 
 ---
 
-## 19. Common Commands at a Glance
+# 23. Common Terminal Commands
 
 ### TAR
 
@@ -667,87 +796,59 @@ unzip archive.zip
 
 ---
 
-## 20. Recommended Fedora KDE Setup
+# 24. Verify the Installation
 
-For a normal Fedora KDE workstation:
-
-### Usually already available
-
-The basic Linux archive and compression tools are normally provided by the system and its standard packages.
-
-You do not need to install every compression utility manually.
-
-### Recommended graphical tool
-
-Install Ark if it is not already installed:
-
-```bash
-sudo dnf install ark
-```
-
-### Recommended additional tool
-
-Install 7-Zip if you regularly work with `.7z` archives or want a versatile command-line archive tool:
-
-```bash
-sudo dnf install 7zip
-```
-
-### Optional RAR support
-
-Install RAR extraction support only if you actually receive RAR archives:
-
-```bash
-sudo dnf install unrar-free
-```
-
-or consider `unar` when its additional RAR handling capabilities are useful:
-
-```bash
-sudo dnf install unar
-```
-
-Do not install both simply because they are available.
-
----
-
-## 21. What Not to Install
-
-Avoid old tutorials that recommend installing large collections of archive utilities without explaining why.
-
-In particular:
-
-* Do not install `p7zip` from an old guide just because it appears in older Linux documentation.
-* Do not install multiple RAR implementations unless you have a specific requirement.
-* Do not install every compression utility individually.
-* Do not download archive programs from random websites when Fedora already provides them.
-* Do not replace Fedora's packaged tools with manually installed binaries without a reason.
-
-Fedora 44 provides the current `7zip` package, which also provides compatibility with the older `p7zip-plugins` interface.
-
----
-
-## 22. Troubleshooting
-
-### Ark does not open an archive
-
-Check that Ark is installed:
+After installing the recommended packages:
 
 ```bash
 rpm -q ark
 ```
 
-If necessary:
+```bash
+rpm -q 7zip
+```
+
+Then:
+
+```bash
+command -v 7z
+```
+
+And:
+
+```bash
+tar --version
+```
+
+For optional RAR support:
+
+```bash
+rpm -q unrar-free
+```
+
+A successful package query confirms that the package is installed.
+
+---
+
+# 25. Troubleshooting
+
+## Ark is not installed
+
+Check:
+
+```bash
+rpm -q ark
+```
+
+If it is missing:
 
 ```bash
 sudo dnf install ark
 ```
 
-Then try opening the archive again.
-
 ---
 
-### 7z command is missing
+## 7z is not available
 
 Check:
 
@@ -761,39 +862,43 @@ If nothing is returned:
 sudo dnf install 7zip
 ```
 
----
-
-### RAR archive cannot be extracted
-
-First identify the archive:
+Then verify:
 
 ```bash
-file archive.rar
+7z
 ```
 
-Then check whether RAR support is installed:
+---
+
+## RAR extraction does not work
+
+Check:
 
 ```bash
 rpm -q unrar-free
 ```
 
-If required:
+If necessary:
 
 ```bash
 sudo dnf install unrar-free
 ```
 
-For more complex RAR archives, `unar` may provide better extraction support:
+Then inspect the archive:
 
 ```bash
-sudo dnf install unar
+unrar-free l archive.rar
 ```
+
+If the archive still cannot be handled, consider another Fedora-supported extraction tool such as `unar`.
 
 ---
 
-### Archive extraction fails
+## Archive extraction fails
 
-First inspect the archive:
+First inspect the archive rather than immediately trying to extract it.
+
+For example:
 
 ```bash
 7z l archive.7z
@@ -813,35 +918,84 @@ unzip -l archive.zip
 
 Then check:
 
-* Whether the file was downloaded completely.
+* Whether the download completed successfully.
 * Whether the archive is corrupted.
-* Whether the archive is password protected.
-* Whether the archive uses a format unsupported by the installed tool.
-* Whether you have enough free disk space.
+* Whether it requires a password.
+* Whether the format is supported.
+* Whether enough disk space is available.
 
-If the publisher provides a checksum, verify it before troubleshooting the archive further.
+If the publisher provides a checksum, verify the downloaded file.
 
 ---
 
-## 23. Recommended Workflow
+# 26. Recommended Setup
 
-For normal Fedora KDE usage:
+For most Fedora KDE Plasma installations, the recommended setup is:
+
+### Essential graphical tool
+
+```bash
+sudo dnf install ark
+```
+
+**Use for:**
+
+* Opening archives from Dolphin.
+* Extracting files.
+* Creating archives.
+* Normal desktop archive management.
+
+### Recommended command-line tool
+
+```bash
+sudo dnf install 7zip
+```
+
+**Use for:**
+
+* `.7z` archives.
+* Command-line archive operations.
+* Working with many common archive formats.
+* More flexible terminal workflows.
+
+### Optional RAR support
+
+```bash
+sudo dnf install unrar-free
+```
+
+**Use only if:**
+
+* You regularly receive RAR archives.
+* Ark or 7-Zip cannot handle a particular RAR archive.
+
+### Other tools
+
+Use `tar`, `gzip`, `xz`, `zstd`, `zip`, and `unzip` when the format or workflow requires them.
+
+Do not install every archive package just because it exists.
+
+---
+
+# 27. Recommended Workflow
+
+For normal desktop use:
 
 ```text
 Archive received
        ↓
-Identify the format
+Open with Dolphin
        ↓
-Open with Ark / Dolphin
+Ark
        ↓
 Inspect contents
        ↓
-Extract to a suitable directory
+Extract
        ↓
 Use the files
 ```
 
-For terminal workflows:
+For terminal work:
 
 ```text
 Identify format
@@ -855,37 +1009,36 @@ Extract
 Verify the extracted files
 ```
 
-This approach keeps archive handling simple and reduces unnecessary packages.
+This provides a simple and reproducible archive workflow without unnecessary software.
 
 ---
 
-## 24. Summary
+# 28. Summary
 
-A clean Fedora KDE installation already has most of the infrastructure required for archive handling.
+For a typical Fedora KDE Plasma workstation:
 
-The recommended approach is:
+1. **Ark** is the recommended graphical archive manager.
+2. **7zip** is the recommended additional command-line archive tool.
+3. `tar` remains an important standard Linux archive utility.
+4. `gzip`, `bzip2`, `xz`, and `zstd` are used according to the archive format.
+5. ZIP tools are useful when exchanging files with other operating systems.
+6. RAR support should be installed only when required.
+7. Inspect archives before extracting them when they come from unknown sources.
+8. Extract downloaded archives into dedicated directories when appropriate.
+9. Verify checksums when publishers provide them.
+10. Prefer Fedora packages over random downloads.
+11. Avoid installing multiple tools that provide the same functionality without a specific reason.
 
-1. Use **Ark + Dolphin** for normal graphical archive management.
-2. Use `tar` for traditional Linux archives.
-3. Use `gzip`, `bzip2`, `xz`, and `zstd` when working with their corresponding formats.
-4. Install **7zip** when 7z archives or additional archive formats are needed.
-5. Install RAR support only when RAR files are actually required.
-6. Inspect archives before extracting them when they come from unknown or untrusted sources.
-7. Extract downloaded archives into dedicated directories when appropriate.
-8. Verify checksums when publishers provide them.
-9. Prefer Fedora packages instead of downloading archive utilities from random websites.
-10. Avoid installing multiple tools that provide the same functionality without a specific reason.
-
-The goal is a simple, maintainable archive environment rather than installing every archive utility available.
+The goal is not to install every archive utility available. The goal is to have the right tools for a clean and practical Fedora KDE workstation.
 
 ---
 
-## 25. Next Steps
+# 29. Next Steps
 
 After configuring archive support, continue with:
 
 * [KDE Setup](08-kde-setup.md)
 
-For applications that may require archive tools, see [Applications](10-applications.md).
-
 For system packages and repositories, see [Repositories](02-repositories.md).
+
+For applications that may require archive tools, see [Applications](10-applications.md).
