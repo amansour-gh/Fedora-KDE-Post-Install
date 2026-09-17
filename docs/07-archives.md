@@ -2,11 +2,11 @@
 
 Fedora KDE already provides most of the tools required to work with common archive and compression formats.
 
-The goal of this setup is to provide a **clean and practical archive environment** without installing unnecessary utilities.
+The goal is to provide a **clean and practical archive environment** without installing unnecessary utilities.
 
 ---
 
-## Recommended Setup
+## 1. Recommended Setup
 
 For a typical Fedora KDE Plasma workstation, install:
 
@@ -18,7 +18,7 @@ sudo dnf install ark 7zip
 
 **Ark** is the recommended graphical archive manager for KDE Plasma.
 
-It integrates naturally with Dolphin and provides support for common archive formats.
+It integrates naturally with Dolphin and supports common archive formats.
 
 **Recommendation:** Install.
 
@@ -30,9 +30,9 @@ It integrates naturally with Dolphin and provides support for common archive for
 
 ---
 
-## Optional RAR Support
+## 2. Optional RAR Support
 
-RAR files are less common but may still be encountered when exchanging files with Windows users.
+RAR files may still be encountered when exchanging files with Windows users.
 
 Install RAR extraction support only if you need it:
 
@@ -46,70 +46,64 @@ Do not install multiple RAR utilities unless a specific compatibility requiremen
 
 ---
 
-## Archive Tools Already Provided by Fedora
+## 3. Standard Archive Tools
 
-The system already provides or uses standard tools for common formats, including:
+Fedora already provides standard tools for many common archive and compression formats.
 
-| Tool            | Format / Purpose              | Recommendation           |
-| --------------- | ----------------------------- | ------------------------ |
-| `tar`           | Linux archives                | Keep                     |
-| `gzip`          | `.gz`                         | Keep / use when required |
-| `bzip2`         | `.bz2`                        | Use when required        |
-| `xz`            | `.xz`                         | Keep / use when required |
-| `zstd`          | `.zst`                        | Keep / use when required |
-| `zip` / `unzip` | `.zip`                        | Install only if needed   |
-| `7zip`          | `.7z` and many other formats  | **Recommended**          |
-| `unrar-free`    | RAR extraction                | Optional                 |
-| `unar`          | Additional archive extraction | Optional                 |
+| Tool            | Format / Purpose             |
+| --------------- | ---------------------------- |
+| `tar`           | Traditional Linux archives   |
+| `gzip`          | `.gz` compression            |
+| `bzip2`         | `.bz2` compression           |
+| `xz`            | `.xz` compression            |
+| `zstd`          | `.zst` compression           |
+| `zip` / `unzip` | ZIP archives                 |
+| `7z`            | 7-Zip and many other formats |
 
-There is no reason to install all of these manually.
+There is no reason to install all archive utilities manually.
+
+Install an additional package only when a real requirement exists.
+
+> **Note:** Package availability can vary between Fedora releases. Use DNF to check whether a particular tool is already installed or available.
 
 ---
 
-## Recommended Installation
+## 4. Verify the Installation
 
-Install the standard Fedora KDE archive setup:
-
-```bash
-sudo dnf install ark 7zip
-```
-
-If RAR support is required:
-
-```bash
-sudo dnf install unrar-free
-```
-
-Verify the installation:
+Verify Ark and 7-Zip:
 
 ```bash
 rpm -q ark 7zip
 ```
 
-And:
+Check that the `7z` command is available:
 
 ```bash
 command -v 7z
 ```
 
+If RAR support was installed, verify it with:
+
+```bash
+rpm -q unrar-free
+```
+
 ---
 
-## Using the Recommended Setup
+## 5. Using the Recommended Setup
 
 ### Graphical
 
-For normal desktop usage:
+For normal desktop usage, open archive files with **Ark**.
 
-```text
-Dolphin → Archive → Ark
-```
+Ark can be used to:
 
-Ark should be the primary graphical tool for:
+* Open archives
+* Extract files
+* Create archives
+* Add or remove archive contents
 
-* Opening archives
-* Extracting files
-* Creating archives
-* Managing archive contents
+Dolphin integrates with Ark for normal archive operations.
 
 ### Terminal
 
@@ -127,7 +121,7 @@ Use `7z` for 7-Zip archives and other formats supported by the tool:
 7z x archive.7z
 ```
 
-For ZIP archives:
+For ZIP archives, if `unzip` is installed:
 
 ```bash
 unzip -l archive.zip
@@ -143,7 +137,7 @@ unrar-free x archive.rar
 
 ---
 
-## Safe Archive Handling
+## 6. Safe Archive Handling
 
 For archives downloaded from the Internet:
 
@@ -161,7 +155,7 @@ file filename
 
 ---
 
-## What to Avoid
+## 7. What to Avoid
 
 Avoid:
 
@@ -175,7 +169,7 @@ Prefer Fedora packages and add optional tools only when a real requirement appea
 
 ---
 
-## Recommended Configuration
+## 8. Recommended Configuration
 
 For a clean Fedora KDE installation:
 
@@ -186,7 +180,7 @@ Primary graphical archive manager
 
 7-Zip
   ↓
-Primary additional command-line archive tool
+Additional command-line archive tool
 
 tar / standard compression tools
   ↓
@@ -201,7 +195,7 @@ This provides broad archive compatibility while keeping the system simple and ma
 
 ---
 
-## Next Steps
+## 9. Next Steps
 
 Continue with:
 
