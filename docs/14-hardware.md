@@ -2,7 +2,9 @@
 
 A practical approach to checking and configuring hardware on Fedora KDE.
 
-Fedora normally provides drivers and kernel support for most common hardware automatically. The goal is to verify that the important devices are working correctly and install additional components only when they are actually required.
+Fedora normally provides kernel support and drivers for most common hardware automatically. The goal is to verify that important devices are working correctly and install additional components only when they are actually required.
+
+---
 
 ## 1. Identify the Hardware
 
@@ -18,7 +20,7 @@ If `inxi` is not installed:
 sudo dnf install inxi
 ```
 
-This can provide a useful overview of:
+`inxi` can provide a useful overview of:
 
 * CPU
 * GPU
@@ -59,7 +61,7 @@ Avoid replacing the Fedora kernel with a custom kernel unless there is a specifi
 
 Some hardware requires firmware provided separately from the Linux kernel.
 
-Check available firmware updates:
+Check whether firmware updates are available:
 
 ```bash
 sudo fwupdmgr get-updates
@@ -71,15 +73,17 @@ If updates are available:
 sudo fwupdmgr update
 ```
 
-You can also check the device status:
+You can also inspect supported devices:
 
 ```bash
 fwupdmgr get-devices
 ```
 
-> **Recommendation:** Prefer firmware supplied through `fwupd` and the normal Fedora update process instead of downloading firmware manually from random sources.
+> **Recommendation:** Prefer firmware supplied through `fwupd` and the normal Fedora update process instead of downloading firmware manually from unofficial sources.
 
 Firmware updates can affect low-level device functionality. Do not interrupt a firmware update.
+
+Not every device supports firmware updates through `fwupd`, so an empty update list does not necessarily indicate a problem.
 
 ---
 
@@ -91,9 +95,9 @@ First identify the installed graphics hardware:
 lspci | grep -Ei 'vga|3d|display'
 ```
 
-For Intel and AMD graphics, the normal Fedora kernel and Mesa stack should generally be used.
+For Intel and AMD graphics, the standard Fedora kernel and Mesa stack should generally be used.
 
-For NVIDIA hardware, use the recommended Fedora-compatible driver source and follow the graphics guidance in [Graphics](05-graphics.md).
+For NVIDIA hardware, follow the graphics guidance in [Graphics](05-graphics.md).
 
 Check the active renderer when troubleshooting graphics:
 
@@ -121,29 +125,31 @@ For VA-API devices, check the available capabilities with:
 vainfo
 ```
 
-If `vainfo` is not installed:
+If `vainfo` is unavailable:
 
 ```bash
 sudo dnf install libva-utils
 ```
 
-Hardware acceleration depends on the GPU, driver, application, codec, and desktop environment.
+Hardware acceleration depends on the GPU, driver, application, codec, and media format.
 
 Do not install additional graphics packages simply because a command is missing. First determine whether the feature is actually required.
+
+See [Multimedia](04-multimedia.md) and [Graphics](05-graphics.md) for more details.
 
 ---
 
 ## 6. Audio
 
-Fedora KDE uses PipeWire for modern audio handling.
+Fedora KDE uses PipeWire and WirePlumber for modern desktop audio.
 
-Check the audio server:
+Check the audio devices:
 
 ```bash
 wpctl status
 ```
 
-You can also check the PipeWire services:
+You can also check the user services:
 
 ```bash
 systemctl --user status pipewire pipewire-pulse wireplumber
@@ -189,7 +195,7 @@ Avoid installing third-party network drivers unless the hardware actually requir
 
 ## 8. Wi-Fi and Bluetooth
 
-Check whether the wireless hardware is detected:
+Check network devices:
 
 ```bash
 nmcli device
@@ -262,9 +268,9 @@ If a display works at a lower resolution or refresh rate than expected, investig
 
 ## 11. Laptop Power Management
 
-Fedora normally provides sensible power management through the desktop and system services.
+Fedora normally provides power management through the desktop environment and system services.
 
-Check the current power profile:
+If `power-profiles-daemon` is installed, check the current power profile:
 
 ```bash
 powerprofilesctl get
@@ -330,7 +336,7 @@ Do not assume that a missing graphical device automatically means that a driver 
 
 ## 14. Hardware Troubleshooting
 
-When hardware does not work, follow a structured process:
+When hardware does not work, follow a structured process.
 
 ### 1. Identify the hardware
 
@@ -380,6 +386,8 @@ journalctl -b -p warning
 ```
 
 This approach is preferable to immediately installing third-party drivers or changing multiple components at once.
+
+For broader troubleshooting procedures, see [Troubleshooting](15-troubleshooting.md).
 
 ---
 
