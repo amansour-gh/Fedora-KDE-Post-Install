@@ -149,6 +149,82 @@ RPM Fusion provides NVIDIA driver packages for supported Fedora releases. The ex
 
 Do not copy an NVIDIA installation command from an old Fedora guide without checking that it applies to the current release.
 
+### NVIDIA Driver Resources
+
+Before installing an NVIDIA driver, check the current information from reliable sources:
+
+* [NVIDIA Linux Drivers](https://www.nvidia.com/en-us/drivers/)
+* [RPM Fusion NVIDIA Driver Packages](https://download1.rpmfusion.org/nonfree/fedora/nvidia-driver/)
+
+NVIDIA also maintains a Linux driver archive containing information about available driver branches.
+
+The appropriate driver branch depends on the NVIDIA GPU generation and the current support provided for the Fedora release.
+
+### Installing the NVIDIA Driver
+
+For a supported NVIDIA GPU, Fedora users should normally prefer the RPM Fusion packages rather than NVIDIA's standalone `.run` installer.
+
+First make sure RPM Fusion Nonfree is enabled. See [Repositories](02-repositories.md).
+
+For GPUs supported by the current NVIDIA driver branch, install:
+
+```bash
+sudo dnf install akmod-nvidia
+```
+
+The `akmod-nvidia` package builds the NVIDIA kernel module for the installed kernel.
+
+After installation, allow some time for the kernel module to be built, then reboot:
+
+```bash
+systemctl reboot
+```
+
+After rebooting, verify the active kernel driver:
+
+```bash
+lspci -k | grep -EA3 'VGA|3D|Display'
+```
+
+You can also check the installed NVIDIA kernel module version:
+
+```bash
+modinfo -F version nvidia
+```
+
+If the NVIDIA driver is loaded correctly, the command should return the installed driver version.
+
+### Legacy NVIDIA GPUs
+
+Older NVIDIA GPUs may require a legacy driver branch rather than the current `akmod-nvidia` package.
+
+RPM Fusion may provide separate packages for supported legacy branches, for example:
+
+```text
+akmod-nvidia-580xx
+akmod-nvidia-470xx
+```
+
+The available branches can change as Fedora and NVIDIA support evolves.
+
+Do not select a legacy package based only on the age of the GPU. First identify the GPU and check the current RPM Fusion packages and NVIDIA documentation for the appropriate driver branch.
+
+### Do Not Mix NVIDIA Installation Methods
+
+Do not install NVIDIA's standalone `.run` installer on a system that is already using RPM Fusion NVIDIA packages.
+
+Avoid mixing:
+
+```text
+RPM Fusion NVIDIA packages
++
+NVIDIA .run installer
+```
+
+Using multiple installation methods can cause package conflicts, kernel-module problems, or difficult-to-maintain configurations.
+
+If RPM Fusion is being used, keep the NVIDIA driver managed through Fedora's package management system.
+
 ---
 
 ## 7. Hybrid Graphics on Laptops
@@ -350,6 +426,7 @@ Avoid the following practices:
 * Installing proprietary drivers without identifying the GPU.
 * Mixing graphics drivers from unrelated repositories.
 * Downloading NVIDIA installers directly from random websites.
+* Using NVIDIA's `.run` installer together with RPM Fusion packages.
 * Copying old NVIDIA commands from previous Fedora releases.
 * Disabling integrated graphics without a specific reason.
 * Manually modifying X11 configuration files on a Wayland system without understanding the consequences.
@@ -370,11 +447,12 @@ For a typical Fedora KDE workstation:
 3. Keep the Fedora kernel and graphics stack updated.
 4. Use Mesa for supported Intel and AMD graphics.
 5. Use an appropriate NVIDIA driver only when required.
-6. Keep hybrid graphics configurations unchanged unless there is a specific need to modify them.
-7. Use KDE System Settings for display configuration.
-8. Verify hardware acceleration when necessary.
-9. Troubleshoot the actual problem before replacing drivers.
-10. Avoid hardware-specific commands in a general-purpose setup.
+6. For NVIDIA, prefer a Fedora-compatible package source such as RPM Fusion when appropriate.
+7. Keep hybrid graphics configurations unchanged unless there is a specific need to modify them.
+8. Use KDE System Settings for display configuration.
+9. Verify hardware acceleration when necessary.
+10. Troubleshoot the actual problem before replacing drivers.
+11. Avoid hardware-specific commands in a general-purpose setup.
 
 The goal is to keep the graphics stack as close as possible to the supported Fedora configuration while making only the changes that the hardware actually requires.
 
