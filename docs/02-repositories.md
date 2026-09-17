@@ -281,6 +281,10 @@ A graphical application may therefore be available as:
 
 The best choice depends on the application and the user's requirements.
 
+For detailed Flatpak configuration and Flathub setup, see:
+
+* [Flatpak and Flathub](09-flatpak.md)
+
 ---
 
 ## 11. Temporarily Disabling a Repository
@@ -415,3 +419,9 @@ Confirm that:
 For a clean Fedora KDE installation, the goal is not to have the largest possible number of repositories.
 
 The goal is to have **the right repositories for the software you actually use**.
+
+## Next Steps
+
+After reviewing repository configuration, continue with:
+
+* [System Updates](03-system-updates.md)

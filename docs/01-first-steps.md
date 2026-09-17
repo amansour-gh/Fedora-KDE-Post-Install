@@ -54,3 +54,9 @@ plasmashell --version
 ```
 
 These commands provide a quick snapshot of the system before continuing with the rest of the guide.
+
+## Next Steps
+
+After completing the initial system update, continue with:
+
+* [Repositories](02-repositories.md)
