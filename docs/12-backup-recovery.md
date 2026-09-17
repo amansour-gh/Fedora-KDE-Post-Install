@@ -1,30 +1,28 @@
 # Backup & Recovery
 
-A practical backup and recovery setup for Fedora KDE, with special consideration for systems using Btrfs and Snapper.
+A practical approach to system snapshots, file recovery, and backups on Fedora KDE.
 
-The goal is to protect both the operating system and personal data while keeping recovery simple and reversible.
+This guide focuses on **Btrfs, Snapper, and backup practices** that can help protect the system from configuration mistakes, package changes, and data loss.
 
----
+> **Important:** Snapshots are not backups. A snapshot stored on the same disk does not protect against disk failure, theft, or major hardware damage.
 
 ## 1. Check the Filesystem
 
-Before configuring Btrfs-specific recovery tools, verify that the system uses Btrfs:
+First, check whether your system uses Btrfs:
 
 ```bash
 findmnt -t btrfs
 ```
 
-If `/` is mounted as `btrfs`, Snapper can be used for system snapshots.
+If Btrfs is being used, you can use Snapper for filesystem snapshots.
 
-> Snapper is useful for system recovery, but snapshots are **not a replacement for an external backup**.
+If your system uses another filesystem, skip the Btrfs/Snapper sections and use a backup solution appropriate for your setup.
 
 ---
 
-## 2. Snapper
+## 2. Verify Snapper
 
-Snapper manages Btrfs snapshots and is particularly useful for recovering from system changes and package updates.
-
-Install it if necessary:
+Install Snapper if it is not already installed:
 
 ```bash
 sudo dnf install snapper
@@ -36,9 +34,7 @@ Check the installed version:
 snapper --version
 ```
 
-### Check Existing Configurations
-
-Do not create a new configuration if one already exists.
+List the existing Snapper configurations:
 
 ```bash
 sudo snapper list-configs
@@ -47,216 +43,236 @@ sudo snapper list-configs
 Typical configurations may include:
 
 ```text
-Config   Subvolume
-root     /
-home     /home
+Config  Subvolume
+root    /
+home    /home
 ```
 
-If the required configuration already exists, no additional setup is necessary.
+Do not create a new configuration if the required configuration already exists.
+
+The available configurations depend on the filesystem layout and how Snapper was configured on the system.
 
 ---
 
-## 3. Automatic Snapshots
+## 3. Check Existing Snapshots
 
-On a correctly configured Fedora system, Snapper may already create automatic timeline snapshots and snapshots around package operations.
-
-Check the root snapshots:
+For a root configuration:
 
 ```bash
 sudo snapper -c root list
 ```
 
-Look for entries such as:
+If a Home configuration exists:
+
+```bash
+sudo snapper -c home list
+```
+
+Review the output before making any changes.
+
+Depending on the configuration, Snapper may contain:
 
 * Timeline snapshots
-* Pre/Post snapshots around package operations
+* Pre/post snapshots created around package operations
+* Manually created snapshots
 
-Automatic snapshot policies should normally be left enabled unless there is a specific reason to change them.
+The presence of a Snapper configuration does **not** necessarily mean that automatic snapshots are enabled.
+
+Likewise, a Home configuration may exist without containing automatic snapshots.
+
+Always verify the actual snapshot list instead of assuming that a particular configuration is active.
 
 ---
 
 ## 4. Create a Manual Snapshot
 
-Before making a significant system change, a manual snapshot can be useful.
-
-For the root filesystem:
+Before making a significant system change, you can create a manual snapshot:
 
 ```bash
 sudo snapper -c root create --description "Before major system change"
 ```
 
-Check the result:
+For example, this can be useful before:
 
-```bash
-sudo snapper -c root list
-```
+* Major system configuration changes
+* Installing or changing system-level software
+* Testing an unfamiliar configuration
+* Making changes that may be difficult to undo manually
 
-For the Home configuration, if available:
-
-```bash
-sudo snapper -c home create --description "Before major user-data change"
-```
+A snapshot gives you a recovery point for the filesystem covered by that Snapper configuration.
 
 ---
 
 ## 5. Btrfs Assistant
 
-**Btrfs Assistant** provides a graphical interface for managing Btrfs and Snapper.
+[Btrfs Assistant](https://gitlab.com/btrfs-assistant/btrfs-assistant) provides a graphical interface for managing Btrfs and Snapper.
 
-Install it when using a Btrfs-based system:
+Install it with:
 
 ```bash
 sudo dnf install btrfs-assistant
 ```
 
-Launch it from the KDE application menu.
+After installation, launch **Btrfs Assistant** from the KDE application menu.
 
-It can be used to:
+Depending on the system configuration, it can be used to:
 
 * View Btrfs filesystems and subvolumes
-* Manage Snapper configurations
-* View snapshots
-* Create and delete snapshots
-* Inspect snapshot differences
-* Perform supported restore operations
+* View Snapper snapshots
+* Create and remove snapshots
+* Inspect snapshot information
+* Perform supported restore and recovery operations
 
-For KDE users, Btrfs Assistant is a convenient graphical alternative to using Snapper entirely from the terminal.
-
-> Keep Snapper CLI available even when using Btrfs Assistant. Recovery should not depend on a single graphical application.
+The graphical interface is convenient, but understanding the underlying Snapper configuration remains important.
 
 ---
 
-## 6. Review Snapshots
+## 6. Review and Manage Snapshots
 
-List root snapshots:
+List snapshots:
 
 ```bash
 sudo snapper -c root list
 ```
 
-List Home snapshots:
+If a Home configuration exists:
 
 ```bash
 sudo snapper -c home list
 ```
 
-Before deleting a snapshot, make sure it is no longer needed.
+Snapshots consume disk space as the filesystem changes.
 
-Delete a specific snapshot:
+Remove an individual snapshot only when you are sure it is no longer needed:
 
 ```bash
-sudo snapper -c root delete SNAPSHOT_NUMBER
+sudo snapper -c root delete <snapshot-number>
 ```
 
-Replace `SNAPSHOT_NUMBER` with the actual snapshot number.
+Replace `<snapshot-number>` with the actual snapshot ID.
 
-Avoid deleting large groups of snapshots without checking the retention policy and available disk space first.
+Avoid deleting snapshots simply because there are many of them. Automatic retention policies are preferable to manually deleting snapshots without understanding their purpose.
 
 ---
 
 ## 7. Recover Files from a Snapshot
 
-Snapshots can be useful when a file was accidentally modified or deleted.
+Snapshots can be useful when a file is accidentally deleted or modified.
 
-First identify the required snapshot:
+A snapshot can contain an earlier version of the file, allowing you to recover it without restoring the entire system.
 
-```bash
-sudo snapper -c home list
-```
+Use Snapper or Btrfs Assistant to identify the appropriate snapshot and locate the required file.
 
-Btrfs Assistant can also be used to browse available snapshots and perform supported recovery operations.
+When possible, recover only the files you need rather than restoring the entire filesystem.
 
-For individual files, prefer restoring only the required files instead of performing a complete system rollback.
+This reduces the risk of overwriting newer data.
 
 ---
 
-## 8. Undo a System Change
+## 8. Undo a Specific System Change
 
-When a specific package or configuration change caused a problem, Snapper can compare two snapshots.
-
-For example:
+For changes that can be represented as a difference between two snapshots, Snapper can show what changed:
 
 ```bash
-sudo snapper -c root status SNAPSHOT1..SNAPSHOT2
+sudo snapper -c root status <pre-number>..<post-number>
 ```
 
-This helps identify files changed between the two snapshots.
-
-For supported changes, Snapper can undo those changes:
+You can review the proposed changes before attempting to undo them:
 
 ```bash
-sudo snapper -c root undochange SNAPSHOT1..SNAPSHOT2
+sudo snapper -c root undochange <pre-number>..<post-number>
 ```
 
-Review the proposed changes carefully before applying them.
+Replace the placeholders with the actual snapshot numbers.
 
-> `undochange` is intended for reverting changes between snapshots. It is different from a full system rollback.
+> **Warning:** Review the changes carefully before applying them. Undoing a change is not always appropriate, especially when other changes were made afterward.
+
+For simple package changes, using DNF to explicitly install or remove the affected package is often safer than reverting an entire snapshot difference.
 
 ---
 
-## 9. System Rollback
+## 9. Full System Rollback
 
-A complete system rollback should be treated as a recovery operation, not a normal maintenance command.
+A complete system rollback is more complex than restoring an individual file or undoing a specific change.
 
-Before performing one:
+Whether a full rollback is appropriate depends on:
 
-1. Confirm the correct snapshot.
-2. Make sure important personal data is backed up separately.
-3. Understand that `/boot` may be on a separate filesystem and is not necessarily included in a Btrfs snapshot.
-4. Prefer Btrfs Assistant or the Fedora/Snapper documentation for the exact rollback procedure for the current filesystem layout.
+* The filesystem layout
+* Snapper configuration
+* Boot configuration
+* Separate `/boot` or EFI partitions
+* Bootloader configuration
+* Encryption
+* NVIDIA or other third-party drivers
+* The exact type of change being reversed
 
-Do not use a rollback command blindly on an unfamiliar Btrfs layout.
+Do not use a generic rollback command without first confirming that the system's layout and Snapper configuration support it.
+
+For systems where a full rollback is appropriate, use the documented Snapper/Btrfs recovery procedure or Btrfs Assistant and verify the available snapshots before proceeding.
+
+Maintain a separate backup before attempting a major rollback whenever possible.
 
 ---
 
-## 10. Real Backups
+## 10. Keep Real Backups
 
-Snapshots protect against unwanted changes, but they do **not** protect against:
+Snapshots protect against certain filesystem and configuration problems, but they do not replace backups.
 
-* Disk failure
-* Loss or theft of the computer
-* Filesystem corruption affecting the entire disk
-* Accidental deletion of all snapshots
-* Physical damage
+A proper backup should be stored on a **different physical device or system**.
 
-For important personal data, keep a separate backup on another storage device or system.
+Possible backup destinations include:
 
-A simple file backup can use `rsync`.
+* External HDD or SSD
+* NAS
+* Another computer
+* Cloud storage
 
-Example:
-
-```bash
-rsync -a --info=progress2 ~/Documents/ /run/media/$USER/Backup/Documents/
-```
-
-To restore:
+For example, `rsync` can be used for file-level backups:
 
 ```bash
-rsync -a --info=progress2 /run/media/$USER/Backup/Documents/ ~/Documents/
+rsync -avh --delete ~/Documents/ /path/to/backup/Documents/
 ```
 
-Adjust the source and destination paths to match the actual backup device.
+> **Warning:** `--delete` removes files from the destination when they no longer exist in the source. Verify the source and destination paths carefully before using it.
 
-> Do not copy the example path blindly. Verify the mounted backup location first.
+For important data, consider maintaining multiple backup copies rather than relying on a single destination.
 
 ---
 
 ## 11. What Should Be Backed Up?
 
-At minimum, consider backing up:
+Prioritize data that would be difficult or impossible to recreate.
+
+### Personal Data
 
 * Documents
-* Pictures
-* Videos
-* Downloads if needed
-* Work/project directories
-* Browser profiles when required
-* Application data
-* SSH keys
-* Important configuration files
-* Password-manager data or vault exports when appropriate
+* Photos and videos
+* Personal files
+* Work files
+* Projects
 
-For KDE systems using KWallet, its data belongs to the protected Home backup and should **never** be committed to Git or uploaded to GitHub.
+### Application Data
+
+Depending on the application:
+
+* Configuration files
+* Profiles
+* Databases
+* Local application data
+
+### Development Data
+
+* Source code
+* Project files
+* Local configuration
+* Environment configuration
+* Important scripts
+
+Keep secrets and credentials out of Git repositories.
+
+If credentials or sensitive application data are stored in your Home directory, make sure your backup strategy protects them appropriately.
+
+> **Security note:** Backup copies can contain sensitive information. Protect backup drives and storage locations with appropriate access controls and encryption when available.
 
 ---
 
@@ -264,47 +280,51 @@ For KDE systems using KWallet, its data belongs to the protected Home backup and
 
 Use different tools for different problems:
 
-| Problem                               | Recommended solution                     |
-| ------------------------------------- | ---------------------------------------- |
-| Accidentally changed a system setting | Snapper                                  |
-| Problem after package update          | Snapper pre/post snapshots               |
-| Deleted/modified personal file        | Home snapshot or backup                  |
-| Need to browse snapshots graphically  | Btrfs Assistant                          |
-| SSD/HDD failure                       | External backup                          |
-| New installation                      | Restore personal data from backup        |
-| Complete system recovery              | Snapper/Btrfs recovery + external backup |
+| Problem                                     | Recommended approach                                              |
+| ------------------------------------------- | ----------------------------------------------------------------- |
+| Accidentally changed a system configuration | Snapper snapshot                                                  |
+| Package operation caused a problem          | Review pre/post Snapper snapshots                                 |
+| Accidentally deleted a file                 | Recover the file from a snapshot or backup                        |
+| Need to undo a specific system change       | Review `snapper undochange`                                       |
+| Disk failure                                | Restore from an external/off-device backup                        |
+| Lost or damaged personal files              | Restore from backup                                               |
+| Major system failure                        | Reinstall if necessary and restore data/configuration from backup |
+
+The key principle is:
+
+**Snapshots help you recover quickly. Backups help you recover when the system or storage itself is lost.**
 
 ---
 
 ## 13. Recommended Final State
 
-A Fedora KDE Btrfs system should ideally have:
+A practical Fedora KDE recovery setup should have:
 
-* Btrfs for the system filesystem
-* Snapper configured for required subvolumes
-* Automatic snapshots enabled
-* Btrfs Assistant available for graphical management
-* Important personal data backed up separately
-* Recovery procedures tested before they are actually needed
+* Btrfs snapshots when supported and useful
+* Snapper configured according to the system's filesystem layout
+* Reasonable snapshot retention
+* A separate backup of important personal data
+* Backup copies stored independently from the main system
+* A recovery procedure that has been tested before an emergency
 
-### Important
-
-**Snapshots are not backups.**
-
-Use Snapper for fast local recovery from system and file changes, and use a separate backup destination for protection against hardware failure or complete system loss.
+Do not rely on snapshots as the only protection for important files.
 
 ---
 
-## What to Avoid
+## 14. What to Avoid
 
-* Treating Snapper snapshots as the only backup
-* Disabling automatic snapshots without a reason
-* Deleting snapshots without checking what they contain
-* Performing a full rollback when only one file needs recovery
-* Storing the only backup on the same physical disk
-* Backing up sensitive credentials to Git/GitHub
-* Using untested third-party backup scripts as the primary recovery method
-* Assuming a snapshot includes separate filesystems such as `/boot` or external storage
+Avoid:
+
+* Treating snapshots as a replacement for backups
+* Assuming Snapper is configured without checking
+* Creating duplicate Snapper configurations unnecessarily
+* Deleting snapshots without understanding their purpose
+* Performing a full rollback without checking the system layout
+* Keeping the only backup on the same physical disk
+* Using `rsync --delete` without verifying the destination
+* Storing sensitive backup data without appropriate protection
+
+---
 
 ## Next Step
 
