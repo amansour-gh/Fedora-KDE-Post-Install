@@ -9,7 +9,7 @@ The goal of this chapter is to explain:
 * Which fonts are useful for a typical Fedora KDE installation.
 * When additional fonts are actually needed.
 * How to install fonts using Fedora packages.
-* How to install Microsoft Core Fonts when compatibility with specific Windows documents is required.
+* How to handle Microsoft fonts when exact compatibility is required.
 * How to install personal fonts downloaded from external sources.
 * How to verify that a font is available.
 * How to refresh the font cache when necessary.
@@ -197,7 +197,7 @@ fc-match "Liberation Sans"
 
 ---
 
-## 6. Microsoft Core Fonts
+## 6. Microsoft Fonts
 
 Some documents and websites are designed around Microsoft fonts such as:
 
@@ -207,100 +207,83 @@ Some documents and websites are designed around Microsoft fonts such as:
 * Georgia
 * Verdana
 * Trebuchet
-* Comic Sans
 * Impact
-* Consolas
-* Cambria
-* Candara
-* Constantia
-* Corbel
 
-If exact font compatibility is required, Fedora's Liberation fonts may not always provide identical font metrics.
-
-Fedora does not provide the original Microsoft Core Fonts as an official Fedora package.
-
-An unofficial RPM installer is available through the `mscorefonts2` project on SourceForge.
-
-> **Important:** The `mscorefonts2` installer is a third-party project and its latest release is old. It should therefore be considered an **optional compatibility solution**, not part of the standard Fedora setup.
-
-### Install Microsoft Core Fonts
-
-The project currently provides:
+For most users, Fedora's Liberation fonts provide useful replacements:
 
 ```text
-msttcore-fonts-installer-2.6-1.noarch.rpm
+Arial           → Liberation Sans
+Times New Roman → Liberation Serif
+Courier New     → Liberation Mono
 ```
 
-The project documents the following installation command:
+However, replacement fonts do not always have identical font metrics.
+
+If exact compatibility with an original Microsoft font is required, the original font files must be obtained from a legitimate source and according to the applicable license.
+
+> **Important:** Microsoft Core Fonts are not provided as an official Fedora font package.
+
+### Installing a Legally Obtained Font
+
+If you have legally obtained the required `.ttf` or `.otf` files, install them for your user account.
+
+Create the personal font directory if necessary:
 
 ```bash
-sudo rpm -i https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm
+mkdir -p ~/.local/share/fonts
 ```
 
-The installer downloads the required font archives during installation and installs the fonts into the system font directories.
-
-After installation, rebuild the font cache:
+Copy the font files into it:
 
 ```bash
-sudo fc-cache -f
+cp ~/Downloads/*.ttf ~/.local/share/fonts/
 ```
 
-Then verify the fonts:
+For OpenType fonts:
 
 ```bash
-fc-match Arial
+cp ~/Downloads/*.otf ~/.local/share/fonts/
 ```
 
-For example:
+Then rebuild the font cache:
 
 ```bash
-fc-match "Times New Roman"
+fc-cache -f
 ```
 
-### Important Limitations
-
-The `mscorefonts2` installer is not an official Microsoft or Fedora package.
-
-The project itself dates back many years and the current RPM was last released in 2013.
-
-It provides the classic Microsoft Core Fonts and some later ClearType fonts, but it should **not** be confused with the complete collection of modern Microsoft fonts.
-
-For example, modern Office fonts such as Aptos are not provided by this installer.
-
-If you specifically require a modern Microsoft font that is not included, obtain the font through a legitimate Microsoft installation or license and install the font manually.
-
-### Fedora Upgrade Consideration
-
-Because the installer is old and uses installation scripts, it can potentially cause problems during Fedora upgrades.
-
-A recent Fedora community report documented an upgrade from Fedora 43 to Fedora 44 becoming stuck because of `msttcore-fonts-installer`.
-
-Therefore:
-
-* Do not install it unless you actually need the original fonts.
-* Keep it out of the standard recommended package list.
-* Before a major Fedora upgrade, check whether the installed package can interfere with the upgrade.
-* Consider removing the package before a major upgrade if it is no longer required.
-
-To check whether it is installed:
+Verify the font:
 
 ```bash
-rpm -q msttcore-fonts-installer
+fc-match "Arial"
 ```
 
-If it is installed and you decide to remove it:
+Replace `Arial` with the actual font family you installed.
+
+> **Note:** Installing fonts under `~/.local/share/fonts` does not require `sudo` and keeps user-installed fonts separate from Fedora-managed system packages.
+
+### Avoid Old Third-Party Installers
+
+Older third-party Microsoft font installers may still be available online, but they should not automatically be considered suitable for a current Fedora installation.
+
+Do not bypass RPM security checks with options such as:
 
 ```bash
-sudo dnf remove msttcore-fonts-installer
+--nodigest
 ```
 
-> **Recommendation:** For most users, use Fedora's Liberation and Noto fonts. Install Microsoft Core Fonts only when document or application compatibility actually requires the original fonts.
+or:
+
+```bash
+--nosignature
+```
+
+A package that fails modern RPM verification should not be forced into the system simply to install a font.
 
 ---
 
 ## 7. Installing Downloaded Fonts
 
-Sometimes a required font is not available through Fedora repositories or the Microsoft Core Fonts installer.
+Sometimes a required font is not available through Fedora repositories.
 
 Common font file formats include:
 
@@ -310,9 +293,7 @@ Common font file formats include:
 .ttc
 ```
 
-For fonts intended only for your user account, install them in your personal font directory.
-
-Create the directory if necessary:
+For fonts intended only for your user account, install them in your personal font directory:
 
 ```bash
 mkdir -p ~/.local/share/fonts
@@ -391,8 +372,6 @@ fc-cache -f
 Then restart the application that should use the font.
 
 For example, if a font was installed while LibreOffice was already running, close and reopen LibreOffice.
-
-The font cache helps Fontconfig locate and reference available fonts.
 
 ---
 
@@ -506,9 +485,9 @@ For example, a document created using Arial may use a different font if Arial is
 Liberation fonts can provide useful substitutes:
 
 ```text
-Arial          → Liberation Sans
+Arial           → Liberation Sans
 Times New Roman → Liberation Serif
-Courier New    → Liberation Mono
+Courier New     → Liberation Mono
 ```
 
 However, a substitute font does not guarantee identical text layout.
@@ -531,6 +510,7 @@ Avoid the following practices:
 * Installing a complete language collection when only one font family is needed.
 * Keeping multiple versions of the same font family.
 * Changing system font configuration files without understanding Fontconfig.
+* Bypassing RPM package verification to install an old third-party package.
 
 If a font does not work, first verify whether the system actually sees it.
 
@@ -559,13 +539,12 @@ For a typical Fedora KDE workstation:
 3. Prefer Fedora packages when the required font is available.
 4. Use Noto fonts when broad language or Unicode coverage is needed.
 5. Use Liberation fonts for compatibility with common Microsoft document fonts.
-6. Install Microsoft Core Fonts only when the original fonts are specifically required.
-7. Treat `msttcore-fonts-installer` as an optional third-party compatibility solution.
-8. Install manually downloaded fonts under `~/.local/share/fonts` when they are only needed for your user account.
-9. Use `fc-match` and `fc-list` to verify font availability.
-10. Run `fc-cache -f` only when necessary.
-11. Restart applications after installing fonts if they do not detect them automatically.
-12. Avoid large font collections unless they are actually required.
+6. Install original Microsoft fonts only when they are specifically required and have been obtained legitimately.
+7. Install manually downloaded fonts under `~/.local/share/fonts` when they are only needed for your user account.
+8. Use `fc-match` and `fc-list` to verify font availability.
+9. Run `fc-cache -f` only when necessary.
+10. Restart applications after installing fonts if they do not detect them automatically.
+11. Avoid large font collections unless they are actually required.
 
 The goal is to maintain a clean font environment while providing the language, document, and application compatibility that the system actually needs.
 
