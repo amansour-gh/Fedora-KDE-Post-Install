@@ -145,20 +145,16 @@ Before installing anything, determine:
 
 If an NVIDIA driver is required, use a maintained Fedora-compatible source and follow the current instructions for the specific Fedora release.
 
-RPM Fusion provides NVIDIA driver packages for supported Fedora releases. The exact package names and supported driver branches can change over time.
-
-Do not copy an NVIDIA installation command from an old Fedora guide without checking that it applies to the current release.
-
 ### NVIDIA Driver Resources
 
-Before installing an NVIDIA driver, check the current information from reliable sources:
+For NVIDIA graphics cards, use the following resources:
 
+* [RPM Fusion NVIDIA Howto](https://rpmfusion.org/Howto/NVIDIA)
 * [NVIDIA Linux Drivers](https://www.nvidia.com/en-us/drivers/)
-* [RPM Fusion NVIDIA Driver Packages](https://download1.rpmfusion.org/nonfree/fedora/nvidia-driver/)
 
-NVIDIA also maintains a Linux driver archive containing information about available driver branches.
+The RPM Fusion NVIDIA guide should be preferred when installing NVIDIA drivers through RPM Fusion because it provides the current installation instructions and information about supported driver branches.
 
-The appropriate driver branch depends on the NVIDIA GPU generation and the current support provided for the Fedora release.
+Do not copy an NVIDIA installation command from an old Fedora guide without checking that it applies to the current release.
 
 ### Installing the NVIDIA Driver
 
@@ -198,16 +194,11 @@ If the NVIDIA driver is loaded correctly, the command should return the installe
 
 Older NVIDIA GPUs may require a legacy driver branch rather than the current `akmod-nvidia` package.
 
-RPM Fusion may provide separate packages for supported legacy branches, for example:
+The appropriate driver branch depends on the GPU generation and the current support provided by RPM Fusion and NVIDIA.
 
-```text
-akmod-nvidia-580xx
-akmod-nvidia-470xx
-```
+Do not select a legacy package based only on the age of the GPU.
 
-The available branches can change as Fedora and NVIDIA support evolves.
-
-Do not select a legacy package based only on the age of the GPU. First identify the GPU and check the current RPM Fusion packages and NVIDIA documentation for the appropriate driver branch.
+If you have an older NVIDIA GPU, check the current [RPM Fusion NVIDIA Howto](https://rpmfusion.org/Howto/NVIDIA) before selecting a driver package.
 
 ### Do Not Mix NVIDIA Installation Methods
 
