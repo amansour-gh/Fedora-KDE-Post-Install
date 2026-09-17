@@ -41,19 +41,13 @@ A full filesystem can cause unexpected problems with applications, updates, and 
 free -h
 ```
 
-On Fedora, some memory usage is expected because Linux uses available memory for caching.
+Linux normally uses available memory for caching, so low `free` memory alone does not necessarily indicate a problem. The `available` value is generally more useful when checking for memory pressure.
 
 ---
 
 ## Package and DNF Problems
 
 If the problem involves installing, removing, or updating software, first check the package manager.
-
-### Check for Package Problems
-
-```bash
-sudo dnf check
-```
 
 ### Review Recent Transactions
 
@@ -67,7 +61,17 @@ To inspect a specific transaction:
 dnf history info <ID>
 ```
 
-This is useful when a problem appears immediately after installing or removing software.
+This is useful when a problem appears immediately after installing, removing, or updating software.
+
+### Check for Package Problems
+
+If you suspect package dependency or consistency problems:
+
+```bash
+sudo dnf check
+```
+
+This can take some time on larger systems, so it is better used when package problems are suspected rather than as a mandatory first check.
 
 ### Review Before Removing Packages
 
@@ -85,7 +89,7 @@ A package may appear unused while still being useful to another application or w
 
 ## Systemd and Service Problems
 
-If a system service is not working, start by checking its status.
+If a system service is not working, start by checking its status:
 
 ```bash
 systemctl status <service>
@@ -101,6 +105,12 @@ For errors from the current boot:
 
 ```bash
 journalctl -b -p err
+```
+
+For a broader warning-level view:
+
+```bash
+journalctl -b -p warning
 ```
 
 Do not restart or disable a service simply because it appears unfamiliar. First determine what the service does and whether it is actually related to the problem.
@@ -125,16 +135,16 @@ glxinfo -B
 
 If `glxinfo` is not available, install the package that provides it only when needed for diagnosis.
 
-For Intel and AMD systems, the standard kernel and Mesa drivers are normally preferred.
+For Intel and AMD systems, the standard Fedora kernel and Mesa drivers are normally preferred.
 
-For NVIDIA systems, use the recommended Fedora-compatible driver source documented in the graphics section of this guide.
+For NVIDIA systems, use the recommended Fedora-compatible driver source documented in [Graphics](05-graphics.md).
 
 ### Wayland
 
 Check the current session:
 
 ```bash
-echo $XDG_SESSION_TYPE
+echo "$XDG_SESSION_TYPE"
 ```
 
 Expected output on a Wayland session:
@@ -144,6 +154,8 @@ wayland
 ```
 
 If a problem occurs only in one application, test the application separately before changing the entire desktop graphics configuration.
+
+For hardware-specific graphics diagnosis, see [Hardware & Devices](14-hardware.md).
 
 ---
 
@@ -166,6 +178,8 @@ systemctl --user status pipewire pipewire-pulse wireplumber
 If the services are active but the wrong output or input device is selected, check the KDE audio settings before changing PipeWire configuration files.
 
 Avoid creating custom PipeWire configuration unless the default setup does not solve the problem.
+
+For general multimedia configuration, see [Multimedia](04-multimedia.md).
 
 ---
 
@@ -193,13 +207,9 @@ systemctl status NetworkManager
 
 For Wi-Fi problems, first determine whether the wireless device is detected before troubleshooting the connection itself.
 
-For example:
-
-```bash
-nmcli device
-```
-
 If the device is not detected, investigate the hardware or driver before changing NetworkManager settings.
+
+For hardware detection, see [Hardware & Devices](14-hardware.md).
 
 ---
 
@@ -218,6 +228,8 @@ bluetoothctl show
 ```
 
 If the controller is available but a device will not connect, remove and pair the device again before making system-level changes.
+
+If the controller itself is not detected, investigate the hardware and firmware before changing Bluetooth configuration.
 
 ---
 
@@ -241,6 +253,8 @@ When troubleshooting KDE Plasma:
 4. Avoid changing several Plasma settings at once.
 
 If a Plasma configuration file needs to be modified, make a backup before changing it.
+
+For hardware-specific display problems, see [Hardware & Devices](14-hardware.md).
 
 ---
 
@@ -270,6 +284,8 @@ A snapshot stored on the same physical disk does not protect against disk failur
 
 Before performing filesystem recovery or rollback operations, identify the affected filesystem and understand the recovery procedure. Do not use a rollback command blindly.
 
+See [Backup & Recovery](12-backup-recovery.md) for snapshot and recovery guidance.
+
 ---
 
 ## Logs and Journal
@@ -280,6 +296,12 @@ The system journal is one of the most useful sources of diagnostic information.
 
 ```bash
 journalctl -b
+```
+
+### Warnings from Current Boot
+
+```bash
+journalctl -b -p warning
 ```
 
 ### Errors from Current Boot
@@ -296,7 +318,7 @@ journalctl -b -1
 
 When reporting a problem, include the relevant error rather than copying the entire journal.
 
-For a specific service:
+For a specific system service:
 
 ```bash
 journalctl -u <service>
@@ -321,16 +343,22 @@ Common sources include:
 * Vendor repositories
 * AppImage
 
-For RPM packages, check the package:
+For RPM packages, check whether the package is installed:
 
 ```bash
-dnf list installed <package>
+rpm -q <package>
 ```
 
 For Flatpak applications:
 
 ```bash
-flatpak list
+flatpak list --app
+```
+
+For information about a specific Flatpak:
+
+```bash
+flatpak info <application-id>
 ```
 
 If an application fails to start, running it from the terminal can reveal useful error messages.
@@ -339,12 +367,12 @@ Before deleting application configuration, make a backup of the relevant configu
 
 Do not immediately reinstall an application. First determine whether the problem is related to:
 
-* the application itself
-* its configuration
-* missing dependencies
-* permissions
-* the desktop environment
-* the graphics or audio stack
+* The application itself
+* Its configuration
+* Missing dependencies
+* Permissions
+* The desktop environment
+* The graphics or audio stack
 
 ---
 
