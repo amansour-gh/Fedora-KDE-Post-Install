@@ -61,7 +61,7 @@ You should identify all GPUs before installing or changing drivers.
 
 ## 3. Check the Kernel Graphics Driver
 
-The `lspci` command can also show which kernel driver is currently associated with a GPU.
+The `lspci` command can also show which kernel driver is currently associated with each GPU.
 
 Run:
 
@@ -88,17 +88,9 @@ Modern Intel integrated graphics are normally supported by the Linux kernel and 
 
 For a typical Intel system, no additional graphics driver installation is required.
 
-First identify the GPU:
+First identify the GPU using [Identify the GPU](#2-identify-the-gpu).
 
-```bash
-lspci | grep -Ei 'vga|3d|display'
-```
-
-Then inspect the active driver:
-
-```bash
-lspci -k | grep -EA3 'VGA|3D|Display'
-```
+Then check the active kernel driver using [Check the Kernel Graphics Driver](#3-check-the-kernel-graphics-driver).
 
 If the Intel GPU is working correctly, avoid installing additional graphics drivers simply because a separate driver package is available.
 
@@ -118,17 +110,9 @@ Additional Mesa packages may already be installed as dependencies of the desktop
 
 AMD graphics support on modern Fedora systems is generally provided by the kernel's AMDGPU driver together with Mesa.
 
-Identify the GPU:
+Identify the GPU using [Identify the GPU](#2-identify-the-gpu).
 
-```bash
-lspci | grep -Ei 'vga|3d|display'
-```
-
-Then check the active driver:
-
-```bash
-lspci -k | grep -EA3 'VGA|3D|Display'
-```
+Then check the active kernel driver using [Check the Kernel Graphics Driver](#3-check-the-kernel-graphics-driver).
 
 For a supported AMD GPU, you normally do not need to install a separate proprietary graphics driver.
 
@@ -142,17 +126,9 @@ For additional graphics troubleshooting, inspect the kernel driver before making
 
 NVIDIA systems require more attention because the appropriate driver depends on the GPU generation and the user's requirements.
 
-First identify the GPU:
+First identify the GPU using [Identify the GPU](#2-identify-the-gpu).
 
-```bash
-lspci | grep -Ei 'vga|3d|display'
-```
-
-Then check the active driver:
-
-```bash
-lspci -k | grep -EA3 'VGA|3D|Display'
-```
+Then check the active kernel driver using [Check the Kernel Graphics Driver](#3-check-the-kernel-graphics-driver).
 
 ### Do Not Install a Driver Automatically
 
@@ -189,17 +165,9 @@ Discrete GPU
 
 The integrated GPU may be used for normal desktop operation while the discrete GPU is used for applications that require additional graphics performance.
 
-Before changing hybrid graphics configuration, identify both GPUs:
+Before changing hybrid graphics configuration, identify both GPUs using [Identify the GPU](#2-identify-the-gpu).
 
-```bash
-lspci | grep -Ei 'vga|3d|display'
-```
-
-Then inspect their drivers:
-
-```bash
-lspci -k | grep -EA3 'VGA|3D|Display'
-```
+Then inspect the active drivers using [Check the Kernel Graphics Driver](#3-check-the-kernel-graphics-driver).
 
 Do not disable the integrated GPU or force all applications to use the discrete GPU without a specific reason.
 
@@ -314,15 +282,11 @@ start by collecting information about the current system.
 
 ### GPU
 
-```bash
-lspci | grep -Ei 'vga|3d|display'
-```
+Use [Identify the GPU](#2-identify-the-gpu).
 
 ### Active Driver
 
-```bash
-lspci -k | grep -EA3 'VGA|3D|Display'
-```
+Use [Check the Kernel Graphics Driver](#3-check-the-kernel-graphics-driver).
 
 ### Session Type
 
