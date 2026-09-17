@@ -2,7 +2,7 @@
 
 A practical, up-to-date post-installation guide for **Fedora KDE Plasma**.
 
-This project provides a collection of recommended steps, configurations, packages, and useful tools to help set up a clean and functional Fedora KDE system after installation.
+This project provides a collection of recommended steps, configurations, packages, and useful tools to help set up a clean, functional, and reliable Fedora KDE system after installation.
 
 The guide focuses on:
 
@@ -27,7 +27,29 @@ Instead, this guide explains **what each step does, why it is useful, and when i
 
 ## Documentation
 
-The detailed guide is organized inside the [`docs`](docs/) directory.
+The guide is organized into the following chapters:
+
+1. [First Steps](docs/01-first-steps.md)
+2. [Repositories](docs/02-repositories.md)
+3. [System Updates](docs/03-system-updates.md)
+4. [Multimedia](docs/04-multimedia.md)
+5. [Graphics](docs/05-graphics.md)
+6. [Fonts](docs/06-fonts.md)
+7. [Archives](docs/07-archives.md)
+8. [KDE Setup](docs/08-kde-setup.md)
+9. [Flatpak](docs/09-flatpak.md)
+10. [Applications](docs/10-applications.md)
+11. [Development](docs/11-development.md)
+12. [Backup and Recovery](docs/12-backup-recovery.md)
+13. [Terminal](docs/13-terminal.md)
+14. [Hardware](docs/14-hardware.md)
+15. [Troubleshooting](docs/15-troubleshooting.md)
+
+Each chapter follows the same general approach:
+
+* **What is recommended?**
+* **Why is it recommended?**
+* **How do I apply it?**
 
 ## Supported System
 
@@ -52,6 +74,6 @@ The project follows a few simple principles:
 
 ## Status
 
-🚧 **Work in progress**
+**Active development**
 
-The guide is being built and tested progressively.
+The guide is usable as a practical Fedora KDE post-installation reference and is continuously reviewed and updated for current Fedora and KDE Plasma releases.
