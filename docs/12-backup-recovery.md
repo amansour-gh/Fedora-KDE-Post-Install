@@ -4,17 +4,19 @@ A practical approach to system snapshots, file recovery, and backups on Fedora K
 
 This guide focuses on **Btrfs, Snapper, and backup practices** that can help protect the system from configuration mistakes, package changes, and data loss.
 
-> **Important:** Snapshots are not backups. A snapshot stored on the same disk does not protect against disk failure, theft, or major hardware damage.
+> **Important:** Snapshots are not backups. A snapshot stored on the same physical disk does not protect against disk failure, theft, or major hardware damage.
+
+---
 
 ## 1. Check the Filesystem
 
 First, check whether your system uses Btrfs:
 
-```bash
+```bash id="7v3k9p"
 findmnt -t btrfs
 ```
 
-If Btrfs is being used, you can use Snapper for filesystem snapshots.
+If Btrfs is being used, Snapper can be used for filesystem snapshots.
 
 If your system uses another filesystem, skip the Btrfs/Snapper sections and use a backup solution appropriate for your setup.
 
@@ -24,33 +26,34 @@ If your system uses another filesystem, skip the Btrfs/Snapper sections and use 
 
 Install Snapper if it is not already installed:
 
-```bash
+```bash id="4m8q2x"
 sudo dnf install snapper
 ```
 
 Check the installed version:
 
-```bash
+```bash id="9c5n7r"
 snapper --version
 ```
 
 List the existing Snapper configurations:
 
-```bash
+```bash id="2k6p1w"
 sudo snapper list-configs
 ```
 
 Typical configurations may include:
 
-```text
+```text id="8r3v5m"
 Config  Subvolume
+
 root    /
 home    /home
 ```
 
-Do not create a new configuration if the required configuration already exists.
+The actual configurations depend on the filesystem layout and how Snapper was configured.
 
-The available configurations depend on the filesystem layout and how Snapper was configured on the system.
+> **Recommendation:** Do not create a new Snapper configuration if the required configuration already exists.
 
 ---
 
@@ -58,13 +61,13 @@ The available configurations depend on the filesystem layout and how Snapper was
 
 For a root configuration:
 
-```bash
+```bash id="6p2m9x"
 sudo snapper -c root list
 ```
 
 If a Home configuration exists:
 
-```bash
+```bash id="3n7q4v"
 sudo snapper -c home list
 ```
 
@@ -88,7 +91,7 @@ Always verify the actual snapshot list instead of assuming that a particular con
 
 Before making a significant system change, you can create a manual snapshot:
 
-```bash
+```bash id="5w8k2n"
 sudo snapper -c root create --description "Before major system change"
 ```
 
@@ -99,7 +102,9 @@ For example, this can be useful before:
 * Testing an unfamiliar configuration
 * Making changes that may be difficult to undo manually
 
-A snapshot gives you a recovery point for the filesystem covered by that Snapper configuration.
+A snapshot provides a recovery point for the filesystem covered by that Snapper configuration.
+
+> **Important:** A snapshot is useful only while the underlying storage remains accessible.
 
 ---
 
@@ -109,7 +114,7 @@ A snapshot gives you a recovery point for the filesystem covered by that Snapper
 
 Install it with:
 
-```bash
+```bash id="1q6v3p"
 sudo dnf install btrfs-assistant
 ```
 
@@ -121,7 +126,7 @@ Depending on the system configuration, it can be used to:
 * View Snapper snapshots
 * Create and remove snapshots
 * Inspect snapshot information
-* Perform supported restore and recovery operations
+* Perform supported management and recovery operations
 
 The graphical interface is convenient, but understanding the underlying Snapper configuration remains important.
 
@@ -131,13 +136,13 @@ The graphical interface is convenient, but understanding the underlying Snapper 
 
 List snapshots:
 
-```bash
+```bash id="9m4r7x"
 sudo snapper -c root list
 ```
 
 If a Home configuration exists:
 
-```bash
+```bash id="2v8k5p"
 sudo snapper -c home list
 ```
 
@@ -145,13 +150,13 @@ Snapshots consume disk space as the filesystem changes.
 
 Remove an individual snapshot only when you are sure it is no longer needed:
 
-```bash
+```bash id="7q3n6m"
 sudo snapper -c root delete <snapshot-number>
 ```
 
 Replace `<snapshot-number>` with the actual snapshot ID.
 
-Avoid deleting snapshots simply because there are many of them. Automatic retention policies are preferable to manually deleting snapshots without understanding their purpose.
+Avoid deleting snapshots simply because there are many of them. If automatic snapshots are configured, reasonable retention policies are preferable to manually deleting snapshots without understanding their purpose.
 
 ---
 
@@ -159,7 +164,7 @@ Avoid deleting snapshots simply because there are many of them. Automatic retent
 
 Snapshots can be useful when a file is accidentally deleted or modified.
 
-A snapshot can contain an earlier version of the file, allowing you to recover it without restoring the entire system.
+A snapshot may contain an earlier version of the file, allowing you to recover it without restoring the entire system.
 
 Use Snapper or Btrfs Assistant to identify the appropriate snapshot and locate the required file.
 
@@ -167,27 +172,31 @@ When possible, recover only the files you need rather than restoring the entire 
 
 This reduces the risk of overwriting newer data.
 
+> **Recommendation:** Prefer file-level recovery when only individual files are affected.
+
 ---
 
-## 8. Undo a Specific System Change
+## 8. Review a Specific System Change
 
-For changes that can be represented as a difference between two snapshots, Snapper can show what changed:
+Snapper can compare two snapshots and show the changes between them.
 
-```bash
+For example:
+
+```bash id="4x7m2q"
 sudo snapper -c root status <pre-number>..<post-number>
-```
-
-You can review the proposed changes before attempting to undo them:
-
-```bash
-sudo snapper -c root undochange <pre-number>..<post-number>
 ```
 
 Replace the placeholders with the actual snapshot numbers.
 
-> **Warning:** Review the changes carefully before applying them. Undoing a change is not always appropriate, especially when other changes were made afterward.
+For changes that are appropriate to reverse, Snapper can generate the corresponding undo operation:
 
-For simple package changes, using DNF to explicitly install or remove the affected package is often safer than reverting an entire snapshot difference.
+```bash id="8p3k6v"
+sudo snapper -c root undochange <pre-number>..<post-number>
+```
+
+> **Warning:** Review the changes carefully before applying them. Undoing a snapshot difference is not the same as performing a complete system rollback, and it may not be appropriate if additional changes were made afterward.
+
+For simple package changes, using DNF to explicitly install or remove the affected package is often safer than reverting a large snapshot difference.
 
 ---
 
@@ -208,7 +217,9 @@ Whether a full rollback is appropriate depends on:
 
 Do not use a generic rollback command without first confirming that the system's layout and Snapper configuration support it.
 
-For systems where a full rollback is appropriate, use the documented Snapper/Btrfs recovery procedure or Btrfs Assistant and verify the available snapshots before proceeding.
+For systems where a full rollback is appropriate, follow the documented Snapper/Btrfs recovery procedure for that filesystem layout and verify the available snapshots before proceeding.
+
+> **Recommendation:** Treat full rollback as an advanced recovery procedure, not as a routine troubleshooting command.
 
 Maintain a separate backup before attempting a major rollback whenever possible.
 
@@ -229,7 +240,7 @@ Possible backup destinations include:
 
 For example, `rsync` can be used for file-level backups:
 
-```bash
+```bash id="6n2v8q"
 rsync -avh --delete ~/Documents/ /path/to/backup/Documents/
 ```
 
@@ -282,17 +293,17 @@ Use different tools for different problems:
 
 | Problem                                     | Recommended approach                                              |
 | ------------------------------------------- | ----------------------------------------------------------------- |
-| Accidentally changed a system configuration | Snapper snapshot                                                  |
-| Package operation caused a problem          | Review pre/post Snapper snapshots                                 |
+| Accidentally changed a system configuration | Review a Snapper snapshot                                         |
+| Package operation caused a problem          | Review relevant pre/post snapshots                                |
 | Accidentally deleted a file                 | Recover the file from a snapshot or backup                        |
-| Need to undo a specific system change       | Review `snapper undochange`                                       |
+| Need to undo a specific system change       | Review `snapper status` and `undochange`                          |
 | Disk failure                                | Restore from an external/off-device backup                        |
 | Lost or damaged personal files              | Restore from backup                                               |
 | Major system failure                        | Reinstall if necessary and restore data/configuration from backup |
 
 The key principle is:
 
-**Snapshots help you recover quickly. Backups help you recover when the system or storage itself is lost.**
+> **Snapshots help you recover quickly. Backups help you recover when the system or storage itself is lost.**
 
 ---
 
@@ -315,17 +326,17 @@ Do not rely on snapshots as the only protection for important files.
 
 Avoid:
 
-* Treating snapshots as a replacement for backups
-* Assuming Snapper is configured without checking
-* Creating duplicate Snapper configurations unnecessarily
-* Deleting snapshots without understanding their purpose
-* Performing a full rollback without checking the system layout
-* Keeping the only backup on the same physical disk
-* Using `rsync --delete` without verifying the destination
-* Storing sensitive backup data without appropriate protection
+* Treating snapshots as a replacement for backups.
+* Assuming Snapper is configured without checking.
+* Creating duplicate Snapper configurations unnecessarily.
+* Deleting snapshots without understanding their purpose.
+* Performing a full rollback without checking the system layout.
+* Keeping the only backup on the same physical disk.
+* Using `rsync --delete` without verifying the destination.
+* Storing sensitive backup data without appropriate protection.
 
 ---
 
-## Next Step
+## Next Steps
 
-Continue with [Terminal & Shell Setup](13-terminal.md) to review the recommended terminal and shell configuration for Fedora KDE.
+Continue with [Terminal & Shell Setup](13-terminal.md).
