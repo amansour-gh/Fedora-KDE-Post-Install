@@ -12,7 +12,6 @@ The goal of this chapter is to explain:
 * How to handle Microsoft fonts when exact compatibility is required.
 * How to install personal fonts downloaded from external sources.
 * How to verify that a font is available.
-* How to refresh the font cache when necessary.
 
 > **Important:** Avoid installing large collections of fonts unless you actually need them. Too many fonts can make font selection more difficult and may create unnecessary duplicates.
 
@@ -22,7 +21,7 @@ The goal of this chapter is to explain:
 
 Before installing additional fonts, check which fonts are already available.
 
-You can list installed fonts with:
+List installed fonts with:
 
 ```bash
 fc-list
@@ -40,19 +39,19 @@ For example:
 fc-list | grep -i "noto"
 ```
 
-You can also use:
+You can also check which font Fontconfig selects for a generic font family:
 
 ```bash
 fc-match sans-serif
 ```
 
-This shows which font Fontconfig selects for the generic `sans-serif` family.
+This is useful when you want to know whether a suitable font is already available before installing another one.
 
 ---
 
-## 2. Use Fedora Font Packages When Possible
+## 2. Prefer Fedora Font Packages
 
-For fonts that are available in Fedora repositories, installing the packaged version is generally preferable to downloading the font manually.
+When a required font is available through Fedora repositories, prefer the packaged version over downloading it manually.
 
 Advantages include:
 
@@ -62,68 +61,61 @@ Advantages include:
 * Dependency management
 * Integration with the Fedora system
 
-Search for available fonts with:
+Search for available font packages with:
 
 ```bash
 dnf search fonts
 ```
 
-You can also search for a specific font:
+You can also search for a specific family:
 
 ```bash
 dnf search noto
 ```
 
-Then inspect a package before installing it:
+Inspect a package before installing it:
 
 ```bash
 dnf info package-name
 ```
 
+Replace `package-name` with the actual package name.
+
+> **Recommendation:** Use Fedora packages whenever the font you need is available there.
+
 ---
 
 ## 3. Useful Font Families
 
-A typical Fedora KDE installation already includes a number of useful fonts.
-
-Additional font families may be useful depending on your requirements.
+A typical Fedora KDE installation already includes useful fonts. Additional families should be installed only when there is a specific requirement.
 
 ### Noto Fonts
 
 Noto is a large font family designed to provide broad Unicode and language coverage.
 
-Fedora provides Noto fonts through packages such as:
-
-```text
-google-noto-fonts
-google-noto-fonts-all
-```
-
-The `google-noto-fonts-all` package contains a very large collection of Noto font families.
-
-Do not install the complete collection unless you specifically need extensive language coverage.
-
-For many users, installing only the required Noto family is a better approach.
-
-For example, search for available Noto packages:
+Fedora provides Noto fonts through multiple packages. Search for available packages with:
 
 ```bash
 dnf search google-noto
 ```
 
-Then install only the package you need.
+Install only the family or language coverage you actually need.
+
+Avoid installing the complete Noto collection unless extensive multilingual coverage is required.
 
 ### Liberation Fonts
 
-Liberation fonts are useful for compatibility with documents that use common Microsoft fonts.
+Liberation fonts are useful substitutes for common Microsoft document fonts.
 
 They provide replacements for:
 
-* Arial → Liberation Sans
-* Times New Roman → Liberation Serif
-* Courier New → Liberation Mono
+```text
+Arial           → Liberation Sans
+Times New Roman → Liberation Serif
+Courier New     → Liberation Mono
+```
 
-Fedora provides these through packages such as:
+Fedora provides individual packages such as:
 
 ```text
 liberation-sans-fonts
@@ -131,19 +123,25 @@ liberation-serif-fonts
 liberation-mono-fonts
 ```
 
-You can install the complete Liberation collection with:
+For example:
+
+```bash
+sudo dnf install liberation-sans-fonts
+```
+
+You can also install the complete Liberation collection when required:
 
 ```bash
 sudo dnf install liberation-fonts-all
 ```
 
-For a normal desktop system, installing only the required families is also sufficient.
+For most users, installing only the required families is sufficient.
 
 ---
 
 ## 4. Arabic Fonts
 
-Fedora provides fonts with Arabic support, but the exact fonts available depend on the installed packages and language requirements.
+Fedora provides fonts with Arabic support, but the available families depend on the installed packages and language requirements.
 
 Before installing additional Arabic fonts, check what is already available:
 
@@ -151,7 +149,7 @@ Before installing additional Arabic fonts, check what is already available:
 fc-list :lang=ar
 ```
 
-You can search Fedora packages for Arabic-related fonts with:
+You can search for Arabic-related font packages with:
 
 ```bash
 dnf search arabic fonts
@@ -162,18 +160,18 @@ When choosing an Arabic font, consider:
 * Arabic glyph quality
 * Latin character support
 * Readability
-* Weight and style availability
+* Available weights and styles
 * Compatibility with the applications you use
 
 Noto and other Unicode fonts can provide broad Arabic and multilingual coverage.
 
-Do not install several Arabic font families simply because they are available.
+> **Recommendation:** Do not install several Arabic font families simply because they are available. Install another family when you have a specific readability, language, or compatibility requirement.
 
 ---
 
-## 5. Install a Font from Fedora
+## 5. Installing a Font from Fedora
 
-Once you have identified the package you need, install it with DNF.
+Once you have identified the required package, install it with DNF.
 
 For example:
 
@@ -181,23 +179,17 @@ For example:
 sudo dnf install liberation-sans-fonts
 ```
 
-Or another required font package:
-
-```bash
-sudo dnf install package-name
-```
-
-After installation, the font should become available to applications through the system font configuration.
-
-You can verify it with:
+After installation, verify that Fontconfig can find the font:
 
 ```bash
 fc-match "Liberation Sans"
 ```
 
+If the package is installed but an application does not see the font, see the verification and troubleshooting sections below.
+
 ---
 
-## 6. Microsoft Fonts
+## 6. Microsoft Fonts and Document Compatibility
 
 Some documents and websites are designed around Microsoft fonts such as:
 
@@ -209,7 +201,7 @@ Some documents and websites are designed around Microsoft fonts such as:
 * Trebuchet
 * Impact
 
-For most users, Fedora's Liberation fonts provide useful replacements:
+For many documents, Fedora's Liberation fonts provide useful substitutes:
 
 ```text
 Arial           → Liberation Sans
@@ -217,67 +209,13 @@ Times New Roman → Liberation Serif
 Courier New     → Liberation Mono
 ```
 
-However, replacement fonts do not always have identical font metrics.
+However, substitute fonts do not always have identical font metrics.
 
-If exact compatibility with an original Microsoft font is required, the original font files must be obtained from a legitimate source and according to the applicable license.
+This can affect document layout, line wrapping, page breaks, and other formatting.
 
-> **Important:** Microsoft Core Fonts are not provided as an official Fedora font package.
+If exact compatibility with an original Microsoft font is required, obtain the original font files from a legitimate source and install them according to the applicable license.
 
-### Installing a Legally Obtained Font
-
-If you have legally obtained the required `.ttf` or `.otf` files, install them for your user account.
-
-Create the personal font directory if necessary:
-
-```bash
-mkdir -p ~/.local/share/fonts
-```
-
-Copy the font files into it:
-
-```bash
-cp ~/Downloads/*.ttf ~/.local/share/fonts/
-```
-
-For OpenType fonts:
-
-```bash
-cp ~/Downloads/*.otf ~/.local/share/fonts/
-```
-
-Then rebuild the font cache:
-
-```bash
-fc-cache -f
-```
-
-Verify the font:
-
-```bash
-fc-match "Arial"
-```
-
-Replace `Arial` with the actual font family you installed.
-
-> **Note:** Installing fonts under `~/.local/share/fonts` does not require `sudo` and keeps user-installed fonts separate from Fedora-managed system packages.
-
-### Avoid Old Third-Party Installers
-
-Older third-party Microsoft font installers may still be available online, but they should not automatically be considered suitable for a current Fedora installation.
-
-Do not bypass RPM security checks with options such as:
-
-```bash
---nodigest
-```
-
-or:
-
-```bash
---nosignature
-```
-
-A package that fails modern RPM verification should not be forced into the system simply to install a font.
+> **Important:** Do not assume that a substitute font will produce identical document layout.
 
 ---
 
@@ -285,7 +223,7 @@ A package that fails modern RPM verification should not be forced into the syste
 
 Sometimes a required font is not available through Fedora repositories.
 
-Common font file formats include:
+Common font formats include:
 
 ```text
 .ttf
@@ -293,77 +231,41 @@ Common font file formats include:
 .ttc
 ```
 
-For fonts intended only for your user account, install them in your personal font directory:
+For fonts needed only by your user account, use the personal font directory:
 
 ```bash
 mkdir -p ~/.local/share/fonts
 ```
 
-Then copy the font files into it.
-
-For example:
+Copy the required font files into it. For example:
 
 ```bash
 cp ~/Downloads/MyFont.ttf ~/.local/share/fonts/
 ```
 
-For multiple font files:
+For OpenType fonts:
+
+```bash
+cp ~/Downloads/MyFont.otf ~/.local/share/fonts/
+```
+
+You can also copy multiple files when necessary:
 
 ```bash
 cp ~/Downloads/MyFont*.ttf ~/.local/share/fonts/
 ```
 
-After copying the fonts, rebuild the font cache:
+User-installed fonts do not require `sudo` and remain separate from Fedora-managed system packages.
 
-```bash
-fc-cache
-```
-
-Fedora documentation recommends using a personal font directory for manually downloaded fonts rather than placing them directly into system directories.
-
-> **Tip:** Installing personal fonts under `~/.local/share/fonts` keeps them separate from Fedora-managed system fonts and does not require `sudo`.
+> **Recommendation:** Prefer `~/.local/share/fonts` for manually downloaded fonts on a personal workstation.
 
 ---
 
-## 8. System-Wide Fonts
-
-A font may sometimes need to be available to all users on the system.
-
-System-wide fonts can be installed through Fedora packages whenever possible.
-
-For manually installed fonts, a system font directory can be used, but this should normally be unnecessary for a personal workstation.
-
-Prefer:
-
-```text
-Fedora package
-        ↓
-system-managed font
-```
-
-or:
-
-```text
-~/.local/share/fonts/
-        ↓
-user-specific font
-```
-
-Avoid copying downloaded fonts directly into arbitrary system directories.
-
----
-
-## 9. Refresh the Font Cache
+## 8. Refreshing the Font Cache
 
 Most applications should detect newly installed fonts automatically.
 
 If a newly installed font does not appear, rebuild the font cache:
-
-```bash
-fc-cache
-```
-
-You can also rebuild the cache more explicitly:
 
 ```bash
 fc-cache -f
@@ -373,9 +275,11 @@ Then restart the application that should use the font.
 
 For example, if a font was installed while LibreOffice was already running, close and reopen LibreOffice.
 
+> **Note:** You normally do not need to run `fc-cache` after every font installation. Use it when the newly installed font is not detected.
+
 ---
 
-## 10. Verify a Font
+## 9. Verifying Font Availability
 
 Use `fc-match` to determine which font Fontconfig selects.
 
@@ -391,7 +295,7 @@ Or:
 fc-match "Liberation Sans"
 ```
 
-To see the actual file being used:
+To see the selected font family and actual file:
 
 ```bash
 fc-match -f '%{family}\n%{file}\n' "Noto Sans"
@@ -399,34 +303,30 @@ fc-match -f '%{family}\n%{file}\n' "Noto Sans"
 
 This is useful when an application appears to be using a different font than expected.
 
----
-
-## 11. Check Arabic Font Matching
-
-For Arabic text, Fontconfig can be queried using the Arabic language tag:
+For Arabic text, you can check language-based font matching:
 
 ```bash
 fc-match :lang=ar
 ```
 
-You can also inspect the available Arabic fonts:
+You can also list fonts that provide Arabic language coverage:
 
 ```bash
 fc-list :lang=ar family
 ```
 
-If Arabic text appears incorrectly, check:
+If Arabic text does not display correctly, check:
 
 1. Whether a suitable Arabic font is installed.
-2. Whether the application supports Arabic shaping correctly.
-3. Whether the selected font contains Arabic glyphs.
-4. Whether another font is being selected as a fallback.
+2. Whether the selected font contains Arabic glyphs.
+3. Whether the application supports Arabic shaping correctly.
+4. Whether another font is being selected as fallback.
 
 Do not assume that a font with good Latin support also provides good Arabic support.
 
 ---
 
-## 12. Fonts in KDE Plasma
+## 10. Fonts in KDE Plasma
 
 KDE Plasma provides font settings through:
 
@@ -443,11 +343,13 @@ Depending on the Plasma version, you can configure fonts used by different parts
 
 When changing KDE fonts, prefer the graphical settings instead of manually editing font configuration files.
 
-This keeps KDE's configuration easy to understand and reproduce.
+This keeps KDE's configuration easier to understand and reproduce.
+
+> **Recommendation:** Avoid changing KDE font settings unless the default appearance or readability does not meet your needs.
 
 ---
 
-## 13. Programming and Terminal Fonts
+## 11. Programming and Terminal Fonts
 
 Developers may want a dedicated monospace font for terminals and code editors.
 
@@ -458,7 +360,7 @@ Common choices include:
 * DejaVu Sans Mono
 * Other programming-oriented monospace fonts
 
-Before installing another font, check whether a suitable monospace font is already installed:
+Before installing another font, check whether a suitable monospace font is already available:
 
 ```bash
 fc-match monospace
@@ -476,29 +378,7 @@ The best choice is largely a matter of readability and personal preference.
 
 ---
 
-## 14. Microsoft Fonts and Document Compatibility
-
-When working with Microsoft Office documents, exact font availability can affect document layout.
-
-For example, a document created using Arial may use a different font if Arial is unavailable.
-
-Liberation fonts can provide useful substitutes:
-
-```text
-Arial           → Liberation Sans
-Times New Roman → Liberation Serif
-Courier New     → Liberation Mono
-```
-
-However, a substitute font does not guarantee identical text layout.
-
-Documents that depend on exact font metrics may still display differently if the original font is not installed.
-
-If exact compatibility is required, use the original font when you are legally permitted to obtain and install it.
-
----
-
-## 15. Avoid Font Problems
+## 12. Avoid Common Font Problems
 
 Avoid the following practices:
 
@@ -506,38 +386,36 @@ Avoid the following practices:
 * Installing the same font from multiple sources.
 * Mixing manually downloaded copies with Fedora packages unnecessarily.
 * Installing outdated third-party font packages without understanding their maintenance status.
-* Copying fonts directly into `/usr/share/fonts` when a user-specific installation is sufficient.
+* Copying fonts directly into system directories when a user-specific installation is sufficient.
 * Installing a complete language collection when only one font family is needed.
 * Keeping multiple versions of the same font family.
-* Changing system font configuration files without understanding Fontconfig.
+* Changing Fontconfig configuration files without understanding their purpose.
 * Bypassing RPM package verification to install an old third-party package.
 
-If a font does not work, first verify whether the system actually sees it.
-
-Useful commands include:
-
-```bash
-fc-list
-```
+If a font does not work, first verify whether the system actually sees it:
 
 ```bash
 fc-match "Font Name"
 ```
 
+If the font was manually installed and is not detected:
+
 ```bash
 fc-cache -f
 ```
 
+Then restart the affected application.
+
 ---
 
-## 16. Recommended Font Setup
+## 13. Recommended Font Setup
 
 For a typical Fedora KDE workstation:
 
 1. Use the fonts already provided by Fedora.
 2. Install additional fonts only when there is a specific requirement.
 3. Prefer Fedora packages when the required font is available.
-4. Use Noto fonts when broad language or Unicode coverage is needed.
+4. Use Noto when broad language or Unicode coverage is needed.
 5. Use Liberation fonts for compatibility with common Microsoft document fonts.
 6. Install original Microsoft fonts only when they are specifically required and have been obtained legitimately.
 7. Install manually downloaded fonts under `~/.local/share/fonts` when they are only needed for your user account.
@@ -550,7 +428,7 @@ The goal is to maintain a clean font environment while providing the language, d
 
 ---
 
-## 17. Next Steps
+## 14. Next Steps
 
 After configuring fonts, continue with:
 
