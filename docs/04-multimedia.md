@@ -14,37 +14,15 @@ Fedora includes many multimedia components by default, but some codecs and forma
 
 For this reason, additional multimedia support is commonly provided through **RPM Fusion**.
 
-If RPM Fusion is not already configured, see [Repositories](02-repositories.md) before continuing.
+If additional multimedia support is required, enable the appropriate RPM Fusion repositories as described in the [Repositories](02-repositories.md) chapter.
+
+> **Note:** RPM Fusion is an optional third-party repository. Do not enable additional repositories simply because they exist. Use them when the software they provide solves a specific requirement.
 
 ---
 
-## 2. Enable RPM Fusion
+## 2. Install Multimedia Support
 
-RPM Fusion provides additional software that complements the packages available in Fedora's official repositories.
-
-If RPM Fusion is not already enabled, install both the Free and Nonfree repositories:
-
-```bash
-sudo dnf install \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-```
-
-After installation, verify the repositories:
-
-```bash
-dnf repolist
-```
-
-You should see RPM Fusion repositories listed alongside the Fedora repositories.
-
-> **Note:** RPM Fusion is an optional third-party repository. Do not enable repositories simply because they exist. Use them when the software they provide solves a specific requirement.
-
----
-
-## 3. Install Multimedia Support
-
-After enabling RPM Fusion, Fedora provides a recommended multimedia group that can install additional codecs and multimedia libraries.
+If you need additional codecs or multimedia libraries, Fedora provides a multimedia package group that can install commonly used multimedia components.
 
 Run:
 
@@ -56,11 +34,13 @@ Review the packages that DNF proposes before confirming the transaction.
 
 The exact packages installed by a group can change between Fedora releases.
 
+If your existing audio and video playback already works correctly, you may not need to install additional multimedia packages.
+
 > **Important:** Do not copy package lists from old Fedora guides without checking whether they are still appropriate for the current release.
 
 ---
 
-## 4. Audio Support with PipeWire
+## 3. Audio Support with PipeWire
 
 Fedora KDE uses **PipeWire** as the modern multimedia and audio framework.
 
@@ -92,13 +72,13 @@ Active: active (running)
 
 ### Check Available Audio Devices
 
-You can inspect the available audio devices with:
+When troubleshooting audio, you can inspect the available devices with:
 
 ```bash
 wpctl status
 ```
 
-This is useful when troubleshooting:
+This is useful for identifying:
 
 * Speakers
 * Headphones
@@ -109,11 +89,11 @@ This is useful when troubleshooting:
 
 ---
 
-## 5. Test Audio
+## 4. Test Audio
 
 Before installing additional audio packages, first verify that the existing system works correctly.
 
-You can use KDE's audio settings to check:
+Use KDE's audio settings to check:
 
 * Output device
 * Input device
@@ -121,19 +101,13 @@ You can use KDE's audio settings to check:
 * Application-specific audio
 * Default audio device
 
-You can also inspect PipeWire's device list:
-
-```bash
-wpctl status
-```
-
 If audio works correctly, there is normally no reason to install additional audio servers or replace PipeWire.
 
 > **Recommendation:** Avoid installing PulseAudio manually on a modern Fedora KDE installation. Fedora uses PipeWire with a PulseAudio-compatible interface for applications that expect PulseAudio.
 
 ---
 
-## 6. Video Playback
+## 5. Video Playback
 
 For local video playback, applications such as VLC or MPV can be installed according to your preference.
 
@@ -155,7 +129,7 @@ KDE's default applications may already provide enough functionality for many use
 
 ---
 
-## 7. Browser Multimedia and DRM
+## 6. Browser Multimedia and DRM
 
 Modern web browsers use their own multimedia components and may require additional configuration for some formats or protected content.
 
@@ -169,7 +143,7 @@ DRM support is separate from installing system-wide multimedia codecs.
 
 ---
 
-## 8. Hardware-Accelerated Video
+## 7. Hardware-Accelerated Video
 
 Hardware acceleration can reduce CPU usage when playing high-resolution video.
 
@@ -188,7 +162,7 @@ Before changing anything, identify the graphics hardware:
 lspci | grep -Ei 'vga|3d|display'
 ```
 
-You can also check whether Mesa is installed:
+You can also check whether the Mesa DRI drivers package is installed:
 
 ```bash
 rpm -q mesa-dri-drivers
@@ -202,7 +176,7 @@ Detailed graphics configuration is covered separately in [Graphics](05-graphics.
 
 ---
 
-## 9. Verifying the Multimedia Stack
+## 8. Verifying the Multimedia Stack
 
 Instead of testing individual codecs with a single GStreamer element name, first verify that GStreamer itself is installed correctly:
 
@@ -222,7 +196,7 @@ This can help identify whether the required multimedia plugins are available.
 
 ---
 
-## 10. Troubleshooting Multimedia Problems
+## 9. Troubleshooting Multimedia Problems
 
 When audio or video does not work, avoid immediately installing large collections of codecs or replacing working system components.
 
@@ -236,7 +210,7 @@ Check PipeWire:
 systemctl --user status pipewire
 ```
 
-Check available devices:
+Check available audio devices:
 
 ```bash
 wpctl status
@@ -252,6 +226,8 @@ lspci | grep -Ei 'vga|3d|display'
 
 Check the installed graphics stack before changing drivers.
 
+For more detailed graphics diagnostics, see [Graphics](05-graphics.md).
+
 ### Applications
 
 If only one application has a multimedia problem, check that application's configuration and documentation first.
@@ -260,7 +236,7 @@ A problem limited to one application does not necessarily indicate a system-wide
 
 ---
 
-## 11. What to Avoid
+## 10. What to Avoid
 
 Avoid the following practices:
 
@@ -276,13 +252,13 @@ A smaller and well-understood multimedia setup is generally easier to maintain.
 
 ---
 
-## 12. Recommended Multimedia Setup
+## 11. Recommended Multimedia Setup
 
 For a typical Fedora KDE workstation:
 
 1. Keep the official Fedora repositories enabled.
 2. Enable RPM Fusion only when required.
-3. Install the appropriate multimedia group when additional codecs are needed.
+3. Install the multimedia group when additional codecs or multimedia libraries are needed.
 4. Keep PipeWire as the default audio system.
 5. Use `wpctl` when troubleshooting audio devices.
 6. Install a media player such as VLC or MPV if needed.
@@ -293,7 +269,7 @@ The goal is to provide broad multimedia support without unnecessary system modif
 
 ---
 
-## 13. Next Steps
+## 12. Next Steps
 
 After configuring multimedia support, continue with:
 
