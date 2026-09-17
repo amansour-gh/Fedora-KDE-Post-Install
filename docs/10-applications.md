@@ -2,26 +2,37 @@
 
 Fedora KDE provides a solid base of applications, but a typical workstation may need additional desktop software.
 
-The goal is to install **only the applications that provide a real benefit**, while choosing an appropriate and maintainable installation source.
+The goal is to install **only applications that provide a real benefit**, while choosing an appropriate and maintainable installation source.
 
 ---
 
-## Recommended Installation Strategy
+## 1. Choosing an Installation Source
 
-When installing an application, prefer sources in this order:
+When installing an application, consider the following sources:
 
 1. **Fedora repositories**
 2. **Flathub**
 3. **Official vendor repository**
-4. **Other trusted sources only when required**
+4. **Other trusted sources when specifically required**
 
-The best source depends on the type of application and how deeply it integrates with the system.
+There is no single source that is always best for every application.
+
+Choose based on:
+
+* Application type
+* System integration
+* Version availability
+* Maintenance
+* Security
+* Update mechanism
+
+> **Recommendation:** Prefer an official and actively maintained source over an unofficial package simply because it is easier to download.
 
 ---
 
-## Fedora Packages
+## 2. Fedora Packages
 
-Prefer Fedora RPM packages for:
+Fedora RPM packages are generally appropriate for:
 
 * System utilities
 * Command-line tools
@@ -41,22 +52,28 @@ Check package information:
 dnf info application-name
 ```
 
+Use DNF for installation:
+
+```bash id="n2w7fd"
+sudo dnf install package-name
+```
+
 ---
 
-## Flatpak Applications
+## 3. Flatpak Applications
 
 Flatpak is often a good choice for desktop applications, especially when:
 
-* A current version is important.
+* A newer version is desirable.
 * The application is well maintained on Flathub.
-* Sandboxing is beneficial.
+* Sandboxing is useful.
 * The Fedora package is unavailable or not suitable.
 
 See [Flatpak](09-flatpak.md) for the recommended Flatpak configuration.
 
 ---
 
-## Official Vendor Packages
+## 4. Official Vendor Packages
 
 Some applications are best installed from their official vendor repository when the vendor provides and maintains one.
 
@@ -66,19 +83,21 @@ Examples may include:
 * Development tools
 * Specialized commercial software
 
-Prefer the vendor's official repository over downloading random RPM files from third-party websites.
+Prefer the vendor's official distribution method over downloading random RPM files from third-party websites.
+
+> **Recommendation:** If a vendor provides an official repository, verify that it is documented and maintained by the vendor before adding it.
 
 ---
 
-## Recommended Application Categories
+## 5. Recommended Application Categories
 
-A typical Fedora KDE workstation may benefit from the following categories.
+A typical Fedora KDE workstation may benefit from the following categories:
 
 | Category               | Recommendation                                        |
 | ---------------------- | ----------------------------------------------------- |
 | Web Browser            | Install your preferred browser                        |
 | Office                 | Install one primary office suite                      |
-| PDF                    | Use a KDE-compatible PDF viewer                       |
+| PDF                    | Use a suitable PDF viewer                             |
 | Media Player           | Install one capable media player                      |
 | Archive Manager        | Ark + 7-Zip                                           |
 | Password Manager       | Use a dedicated password manager                      |
@@ -91,36 +110,52 @@ The exact applications should depend on the user's workflow rather than a fixed 
 
 ---
 
-## Office Applications
+## 6. Office Applications
 
 Choose **one primary office suite** unless compatibility requirements justify more than one.
 
-Possible choices include:
+Common choices include:
 
 * LibreOffice
 * ONLYOFFICE
 
 Avoid installing multiple office suites without a specific reason.
 
+Consider:
+
+* Document compatibility
+* Microsoft Office file support
+* Required features
+* Performance
+* Maintenance
+
 ---
 
-## PDF
+## 7. PDF Applications
 
-KDE's PDF applications provide suitable support for normal desktop use.
+KDE provides suitable PDF support for normal desktop use.
+
+Use the default KDE PDF application when it meets your requirements.
 
 Install an alternative PDF application only when a specific feature is required.
 
+Avoid installing several PDF viewers without a reason.
+
 ---
 
-## Media
+## 8. Media Applications
 
-For normal multimedia playback, install a capable media player such as VLC when the default applications do not meet your requirements.
+For normal multimedia playback, the applications already provided by Fedora KDE may be sufficient.
+
+Install a capable media player such as VLC when the existing applications do not meet your requirements.
 
 Avoid installing several media players that provide the same functionality unless there is a specific need.
 
+For multimedia and codec configuration, see [Multimedia](04-multimedia.md).
+
 ---
 
-## Password Management
+## 9. Password Management
 
 Use a dedicated password manager for personal passwords.
 
@@ -131,13 +166,43 @@ Examples include:
 
 KDE Wallet serves a different purpose and should not automatically be treated as a replacement for a dedicated password manager.
 
+For KDE Wallet configuration, see [KDE Setup](08-kde-setup.md).
+
 ---
 
-## Development Software
+## 10. Communication Applications
+
+Install only the communication applications required for your workflow.
+
+Prefer:
+
+* Fedora packages when appropriate.
+* Flathub for supported desktop applications.
+* Official vendor repositories when they are the maintained distribution method.
+
+Avoid unofficial packages when an official source is available.
+
+---
+
+## 11. Cloud Storage
+
+Install a cloud-storage client only when synchronization with a service is actually required.
+
+Before installing one, consider whether the service already provides:
+
+* A web interface
+* A supported desktop client
+* A KDE-compatible integration method
+
+Avoid running multiple synchronization clients for the same data.
+
+---
+
+## 12. Development Software
 
 Development environments should be installed according to actual requirements.
 
-Examples:
+Common tools include:
 
 * Git
 * GCC / G++
@@ -152,71 +217,46 @@ Development setup is covered separately in [Development](11-development.md).
 
 ---
 
-## Communication Applications
-
-Install only the communication applications required for your workflow.
-
-Prefer:
-
-* Fedora packages when appropriate.
-* Flathub for supported desktop applications.
-* Official vendor repositories when they are the maintained distribution method.
-
-Avoid unofficial packages when an official source is available.
-
----
-
-## Cloud Storage
-
-Install a cloud-storage client only when synchronization with a service is actually required.
-
-Avoid running multiple synchronization clients for the same data.
-
----
-
-## Application Sources
-
-Before installing an application, check:
-
-```text
-Fedora repository
-        ↓
-Flathub
-        ↓
-Official vendor repository
-        ↓
-Other trusted source only when required
-```
-
-Do not use a random download website simply because it provides an RPM.
-
----
-
-## Avoid Duplicate Installations
+## 13. Avoid Duplicate Installations
 
 Do not normally install the same application from multiple sources.
 
 For example:
 
-```text
+```text id="e2y4cq"
 Firefox → Fedora RPM
+
 Firefox → Flatpak
 ```
 
 Choose one unless there is a specific reason to keep both.
 
-This reduces:
+This helps reduce:
 
-* Duplicate files
+* Duplicate installations
 * Conflicting defaults
 * Maintenance overhead
 * Confusion about updates
 
+Before installing an application, check whether another version is already installed.
+
+For Flatpak applications:
+
+```bash id="j7r5p1"
+flatpak list --app
+```
+
+For RPM packages, use:
+
+```bash id="m4x8q2"
+dnf list --installed
+```
+
 ---
 
-## Application Maintenance
+## 14. Application Maintenance
 
-Keep applications updated using their respective package system.
+Keep applications updated through their respective package systems.
 
 Fedora packages:
 
@@ -230,21 +270,25 @@ Flatpak applications:
 flatpak update
 ```
 
-Vendor repositories are normally updated through DNF as well.
+Applications installed through vendor repositories are normally updated through DNF as well.
+
+For the complete update procedure, see [System Updates](03-system-updates.md).
 
 ---
 
-## What to Avoid
+## 15. What to Avoid
 
 Avoid:
 
-* Installing software just because it is popular.
-* Installing multiple applications for the same purpose.
-* Random RPM downloads.
-* Unmaintained third-party repositories.
-* Installation scripts from unknown websites.
+* Installing software simply because it is popular.
+* Installing multiple applications for the same purpose without a reason.
+* Downloading random RPM files.
+* Adding unmaintained third-party repositories.
+* Running installation scripts from unknown websites.
 * Keeping applications that are no longer used.
 * Mixing multiple package formats without a reason.
+
+Prefer the simplest supported installation method that meets the application's requirements.
 
 ---
 
@@ -253,14 +297,14 @@ Avoid:
 A clean Fedora KDE workstation should contain:
 
 * Only the applications actually required.
-* One primary application for each common task.
+* A sensible primary application for each common task.
 * Trusted and maintainable software sources.
 * Regularly updated applications.
 * Minimal duplicate software.
 
 The goal is not to install everything available.
 
-**Install what you need, from the most appropriate source, and keep the system maintainable.**
+> **Install what you need, from the most appropriate source, and keep the system maintainable.**
 
 ---
 
