@@ -12,7 +12,7 @@ This chapter explains how to configure multimedia support while keeping the syst
 
 Fedora includes many multimedia components by default, but some codecs and formats cannot be distributed directly in Fedora's official repositories because of licensing or other distribution restrictions.
 
-For this reason, additional multimedia support is commonly provided through **RPM Fusion**.
+For this reason, additional multimedia support may be provided through **RPM Fusion**.
 
 If additional multimedia support is required, enable the appropriate RPM Fusion repositories as described in the [Repositories](02-repositories.md) chapter.
 
